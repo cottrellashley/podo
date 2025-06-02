@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  body {
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    background-color: #f2f2f7;
+    color: #1c1c1e;
+    line-height: 1.47;
+    letter-spacing: -0.003em;
+  }
+}
+
+@layer components {
+  .tab-button {
+    @apply flex-1 py-4 px-6 text-center font-medium text-base transition-all duration-200 ease-out;
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  .tab-button.active {
+    background-color: rgb(117, 148, 145);
+    @apply text-white shadow-sm;
+  }
+  
+  .tab-button.inactive {
+    @apply bg-white text-gray-700 hover:bg-gray-50;
+  }
+  
+  .content-container {
+    @apply p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto;
+  }
+
+  .button-primary {
+    background-color: rgb(117, 148, 145);
+    @apply text-white font-medium rounded-xl transition-all duration-150 ease-out shadow-sm hover:shadow-md;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 20px;
+  }
+  
+  .button-primary:hover {
+    background-color: rgb(107, 138, 135);
+  }
+  
+  .button-primary:active {
+    background-color: rgb(97, 128, 125);
+  }
+
+  .button-secondary {
+    @apply bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-200 transition-all duration-150 ease-out shadow-sm hover:shadow-md;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 12px 20px;
+  }
+
+  .button-danger {
+    @apply text-red-500 hover:text-red-600 active:text-red-700 hover:bg-red-50 active:bg-red-100 rounded-lg transition-all duration-150 ease-out;
+    min-height: 44px;
+    min-width: 44px;
+    padding: 10px;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 border border-gray-200 rounded-xl transition-all duration-150 ease-out bg-white;
+    min-height: 44px;
+    font-size: 16px;
+  }
+  
+  .input-field:focus {
+    outline: none;
+    border-color: rgb(117, 148, 145);
+    box-shadow: 0 0 0 2px rgba(117, 148, 145, 0.2);
+  }
+
+  .card {
+    @apply bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 ease-out;
+  }
+
+  .card-interactive {
+    @apply cursor-pointer hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .modal-overlay {
+    @apply fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex items-center justify-center p-4 z-50;
+  }
+
+  .modal-content {
+    @apply bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl;
+  }
+
+  .icon-container {
+    @apply p-3 rounded-2xl flex items-center justify-center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .text-heading {
+    @apply text-2xl font-bold text-gray-900;
+    line-height: 1.2;
+    letter-spacing: -0.022em;
+  }
+
+  .text-subheading {
+    @apply text-lg font-semibold text-gray-900;
+    line-height: 1.3;
+    letter-spacing: -0.017em;
+  }
+
+  .text-body {
+    @apply text-base text-gray-600;
+    line-height: 1.47;
+    letter-spacing: -0.003em;
+  }
+
+  .text-caption {
+    @apply text-sm text-gray-500;
+    line-height: 1.43;
+    letter-spacing: -0.003em;
+  }
+
+  .divider {
+    @apply border-t border-gray-100;
+  }
+
+  .form-section {
+    @apply space-y-4 p-6;
+  }
+
+  .form-group {
+    @apply space-y-2;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+    line-height: 1.43;
+    letter-spacing: -0.003em;
+  }
+
+  .dynamic-list-item {
+    @apply flex gap-3 items-start;
+  }
+
+  .add-button {
+    color: rgb(117, 148, 145);
+    @apply text-sm font-medium flex items-center gap-2 transition-colors duration-150 ease-out;
+    min-height: 44px;
+  }
+  
+  .add-button:hover {
+    color: rgb(107, 138, 135);
+  }
+  
+  .add-button:active {
+    color: rgb(97, 128, 125);
+  }
+  
+  /* Brand Color Utilities */
+  .bg-brand {
+    background-color: rgb(117, 148, 145);
+  }
+  
+  .bg-brand-hover:hover {
+    background-color: rgb(107, 138, 135);
+  }
+  
+  .bg-brand-active:active {
+    background-color: rgb(97, 128, 125);
+  }
+  
+  .bg-brand-50 {
+    background-color: rgba(117, 148, 145, 0.1);
+  }
+  
+  .bg-brand-100 {
+    background-color: rgba(117, 148, 145, 0.2);
+  }
+  
+  .border-brand {
+    border-color: rgb(117, 148, 145);
+  }
+  
+  .border-brand-100 {
+    border-color: rgba(117, 148, 145, 0.2);
+  }
+  
+  .border-brand-200 {
+    border-color: rgba(117, 148, 145, 0.3);
+  }
+  
+  .text-brand {
+    color: rgb(117, 148, 145);
+  }
+  
+  .text-brand-600 {
+    color: rgb(117, 148, 145);
+  }
+  
+  .text-brand-700 {
+    color: rgb(107, 138, 135);
+  }
+  
+  .text-brand-800 {
+    color: rgb(97, 128, 125);
+  }
+  
+  .ring-brand {
+    --tw-ring-color: rgb(117, 148, 145);
+  }
+}
