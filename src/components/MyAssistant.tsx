@@ -215,7 +215,7 @@ const MyAssistant: React.FC = () => {
             <img 
               src={podoLogo} 
               alt="Podo Logo" 
-              className="h-8 w-8 object-contain"
+              className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 shadow-sm"
             />
             <h2 className="text-heading">My Assistant</h2>
           </div>

@@ -36,7 +36,7 @@ function AppContent() {
           <img 
             src={podoLogo} 
             alt="Podo Logo" 
-            className="h-16 w-16 object-contain mx-auto mb-4"
+            className="h-20 w-20 object-cover rounded-full border-2 border-gray-200 shadow-sm mx-auto mb-4"
           />
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand mx-auto"></div>
           <p className="text-gray-600 mt-4">Loading...</p>
@@ -118,22 +118,21 @@ function AppContent() {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0 ${
+      <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-white border-r border-gray-200 shadow-lg transform transition-transform duration-300 ease-in-out ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         {/* Sidebar Header */}
         <div className="flex items-center justify-between h-20 px-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center justify-center w-full">
             <img 
               src={podoLogo} 
               alt="Podo Logo" 
-              className="h-8 w-8 object-contain"
+              className="h-12 w-12 object-cover rounded-full border-2 border-gray-200 shadow-sm"
             />
-            <h1 className="text-xl font-bold text-gray-900">Podo</h1>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors lg:hidden"
+            className="absolute right-4 p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -203,12 +202,12 @@ function AppContent() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Mobile Header - Only shows hamburger menu on mobile */}
-        <header className="bg-white border-b border-gray-100 shadow-sm lg:hidden">
+        {/* Header with Hamburger Menu */}
+        <header className="bg-white border-b border-gray-100 shadow-sm">
           <div className="flex items-center justify-between h-16 px-4">
-            {/* Mobile Menu Button */}
+            {/* Hamburger Menu Button */}
             <button
-              onClick={() => setSidebarOpen(true)}
+              onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <Menu className="w-6 h-6" />

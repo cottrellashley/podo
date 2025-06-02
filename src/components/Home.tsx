@@ -76,7 +76,7 @@ const Home: React.FC = () => {
           <img 
             src={podoLogo} 
             alt="Podo Logo" 
-            className="h-16 w-16 object-contain"
+            className="h-20 w-20 object-cover rounded-full border-2 border-gray-200 shadow-sm"
           />
           <h1 className="text-4xl font-bold text-gray-900">
             Welcome to Podo

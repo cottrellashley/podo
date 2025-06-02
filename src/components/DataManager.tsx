@@ -126,7 +126,7 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
               <img 
                 src={podoLogo} 
                 alt="Podo Logo" 
-                className="h-8 w-8 object-contain"
+                className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 shadow-sm"
               />
               <h3 className="text-subheading">Data Management - {getTabDisplayName()}</h3>
             </div>

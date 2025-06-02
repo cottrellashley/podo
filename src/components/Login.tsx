@@ -158,7 +158,7 @@ const Login: React.FC = () => {
             <img 
               src={podoLogo} 
               alt="Podo Logo" 
-              className="h-12 w-12 object-contain"
+              className="h-16 w-16 object-cover rounded-full border-2 border-gray-200 shadow-sm"
             />
             <h1 className="text-2xl font-bold text-gray-900">Podo</h1>
           </div>
