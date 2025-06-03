@@ -354,7 +354,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
                   <Package className="w-5 h-5" />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">My Objects</h4>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">Library</h4>
                   <p className="text-xs text-gray-600 dark:text-gray-400">Manage recipes, workouts & todos</p>
                 </div>
               </div>

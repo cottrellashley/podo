@@ -218,14 +218,9 @@ const MyAssistant: React.FC = () => {
               alt="Podo Logo" 
               className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 dark:border-gray-600 shadow-sm"
             />
-            <h2 className="text-heading">My Assistant</h2>
+            <h2 className="text-heading">Assistant</h2>
           </div>
-          <p className="text-body">
-            {aiApiKey 
-              ? 'Your AI-powered assistant for recipes, workouts, and tasks'
-              : 'Configure your AI assistant to get started'
-            }
-          </p>
+          <p className="text-body mt-1">Get AI-powered help with planning and organization</p>
         </div>
         <div className="flex gap-3">
           <button 

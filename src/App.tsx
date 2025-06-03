@@ -61,7 +61,7 @@ function AppContent() {
     },
     {
       id: 'objects',
-      label: 'My Objects',
+      label: 'Library',
       icon: <Package className="w-4 h-4" />,
       component: <MyObjects onOpenDataManager={() => setShowDataManager(true)} />,
       requiresAuth: true
@@ -75,14 +75,14 @@ function AppContent() {
     },
     {
       id: 'analytics',
-      label: 'My Analytics',
+      label: 'Analytics',
       icon: <BarChart3 className="w-4 h-4" />,
       component: <MyAnalytics />,
       requiresAuth: true
     },
     {
       id: 'assistant',
-      label: 'My Assistant',
+      label: 'Assistant',
       icon: <Bot className="w-4 h-4" />,
       component: <MyAssistant />,
       requiresAuth: true

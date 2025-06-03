@@ -284,7 +284,7 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
       {/* Header Section */}
       <div className="section-header">
         <div>
-          <h2 className="text-heading">My Objects</h2>
+          <h2 className="text-heading">Library</h2>
           <p className="text-body mt-1">Manage your recipes, workouts, and todo lists</p>
         </div>
         <div className="mobile-flex">

@@ -113,8 +113,8 @@ const MyAnalytics: React.FC = () => {
       {/* Header Section */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <div className="space-y-2">
-          <h2 className="text-heading">My Analytics</h2>
-          <p className="text-body">Insights and summaries for your weekly planning</p>
+          <h2 className="text-heading">Analytics</h2>
+          <p className="text-body mt-1">Track your progress and activity patterns</p>
         </div>
       </div>
 

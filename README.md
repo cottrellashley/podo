@@ -1,14 +1,14 @@
 # Podo - React TypeScript Web Application
 
-A modern, responsive React TypeScript web application built with Vite, featuring three main sections: My Objects, My Week, and My Analytics. Optimized for both mobile and desktop experiences.
+A modern, responsive React TypeScript web application built with Vite, featuring three main sections: Library, My Week, and Analytics. Optimized for both mobile and desktop experiences.
 
 ## 🚀 Features
 
 - **Mobile-First Responsive Design**: Optimized for phone screens with excellent desktop visibility
 - **Three Main Tabs**:
-  - **My Objects**: Manage files, documents, and projects with search functionality
+  - **Library**: Manage files, documents, and projects with search functionality
   - **My Week**: Weekly calendar view with event management and quick stats
-  - **My Analytics**: Performance metrics, charts, and activity tracking
+  - **Analytics**: Performance metrics, charts, and activity tracking
 - **Modern UI**: Built with Tailwind CSS for beautiful, consistent styling
 - **TypeScript**: Full type safety and better development experience
 - **Fast Development**: Powered by Vite for lightning-fast builds and HMR

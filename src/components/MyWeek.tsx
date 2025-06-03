@@ -685,7 +685,7 @@ const MyWeek: React.FC<MyWeekProps> = ({ onOpenDataManager }) => {
                               No {addType}s available
                             </h4>
                             <p className="text-xs text-amber-700 dark:text-amber-400">
-                              Create one in "My Objects" first, then schedule it here.
+                              Create one in "Library" first, then schedule it here.
                             </p>
                           </div>
                         </div>
