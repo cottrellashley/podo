@@ -47,3 +47,34 @@ server/node_modules
 docker-compose.override.yml
 *.sql.backup
 backup.sql
+
+# Documentation files that may contain secrets
+SERVER_TESTING_GUIDE.md
+DIGITALOCEAN_DEPLOYMENT.md
+SERVER_API_DOCUMENTATION.md
+LOCAL_DEVELOPMENT.md
+
+# Docker environment files
+env.docker
+docker-compose.dev.yml
+
+# Any files containing credentials or secrets
+*credentials*
+*secrets*
+*keys*
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Backup files
+*.backup
+*.bak
+*.old
+
+# Configuration files that might contain secrets
+config.json
+config.local.json
+settings.json
+settings.local.json
