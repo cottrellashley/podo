@@ -1,64 +1,16 @@
 import React from 'react';
-import { Calendar, Package, BarChart3, Bot, ChefHat, Dumbbell, CheckSquare, Sparkles, Clock, Target } from 'lucide-react';
+import { Calendar, Package, Bot, ChefHat, Dumbbell, CheckSquare, User, Clock, Check, Plus, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import podoLogo from '../assets/podo_logo.png';
+import { useAppContext } from '../context/AppContext';
+import type { IndividualTodo, TimeCategory } from '../types';
 
-const Home: React.FC = () => {
+interface HomeProps {
+  onNavigate?: (tab: 'objects' | 'week' | 'assistant') => void;
+}
+
+const Home: React.FC<HomeProps> = ({ onNavigate }) => {
   const { user } = useAuth();
-
-  const features = [
-    {
-      icon: <Package className="w-8 h-8" />,
-      title: 'My Objects',
-      description: 'Create and manage your recipes, workouts, and todo lists in one organized place.',
-      color: 'bg-emerald-50 border-emerald-200 text-emerald-600'
-    },
-    {
-      icon: <Calendar className="w-8 h-8" />,
-      title: 'My Week',
-      description: 'Plan your weekly schedule with time-based organization and smart scheduling.',
-      color: 'bg-brand-50 border-brand-200 text-brand-600'
-    },
-    {
-      icon: <BarChart3 className="w-8 h-8" />,
-      title: 'My Analytics',
-      description: 'Track your progress and get insights into your habits and achievements.',
-      color: 'bg-purple-50 border-purple-200 text-purple-600'
-    },
-    {
-      icon: <Bot className="w-8 h-8" />,
-      title: 'AI Assistant',
-      description: 'Get personalized help creating content and organizing your schedule.',
-      color: 'bg-amber-50 border-amber-200 text-amber-600'
-    }
-  ];
-
-  const quickActions = [
-    {
-      icon: <ChefHat className="w-6 h-6" />,
-      title: 'Create Recipe',
-      description: 'Add a new recipe to your collection',
-      color: 'bg-green-500 hover:bg-green-600'
-    },
-    {
-      icon: <Dumbbell className="w-6 h-6" />,
-      title: 'Plan Workout',
-      description: 'Design your next fitness routine',
-      color: 'bg-brand hover:bg-brand-hover'
-    },
-    {
-      icon: <CheckSquare className="w-6 h-6" />,
-      title: 'Add Todo List',
-      description: 'Organize your tasks and goals',
-      color: 'bg-purple-500 hover:bg-purple-600'
-    },
-    {
-      icon: <Calendar className="w-6 h-6" />,
-      title: 'Schedule Items',
-      description: 'Plan your week ahead',
-      color: 'bg-indigo-500 hover:bg-indigo-600'
-    }
-  ];
+  const { scheduledItems, toggleItemCompletion } = useAppContext();
 
   const getCurrentTimeGreeting = () => {
     const hour = new Date().getHours();
@@ -68,181 +20,347 @@ const Home: React.FC = () => {
     return 'Good night';
   };
 
+  const getTodayString = () => {
+    return new Date().toISOString().split('T')[0];
+  };
+
+  const getTodaysItems = () => {
+    const today = getTodayString();
+    return scheduledItems
+      .filter(item => item.date === today)
+      .sort((a, b) => {
+        const categoryOrder = { Morning: 0, Afternoon: 1, Evening: 2, Night: 3 };
+        const categoryDiff = categoryOrder[a.timeCategory] - categoryOrder[b.timeCategory];
+        return categoryDiff !== 0 ? categoryDiff : a.order - b.order;
+      });
+  };
+
+  const getItemIcon = (type: string) => {
+    switch (type) {
+      case 'recipe':
+        return <ChefHat className="w-5 h-5" />;
+      case 'workout':
+        return <Dumbbell className="w-5 h-5" />;
+      case 'todoList':
+        return <CheckSquare className="w-5 h-5" />;
+      case 'individualTodo':
+        return <User className="w-5 h-5" />;
+      default:
+        return <Calendar className="w-5 h-5" />;
+    }
+  };
+
+  const getTimeCategoryColor = (category: TimeCategory) => {
+    switch (category) {
+      case 'Morning':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-700';
+      case 'Afternoon':
+        return 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-700';
+      case 'Evening':
+        return 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-700';
+      case 'Night':
+        return 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-700';
+      default:
+        return 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
+    }
+  };
+
+  const getItemColor = (type: string) => {
+    switch (type) {
+      case 'recipe':
+        return 'bg-green-50 border-green-200 hover:bg-green-100 dark:bg-green-900/20 dark:border-green-700 dark:hover:bg-green-900/30';
+      case 'workout':
+        return 'bg-brand-50 border-brand-200 hover:bg-brand-100 dark:bg-brand-900/20 dark:border-brand-700 dark:hover:bg-brand-900/30';
+      case 'todoList':
+        return 'bg-purple-50 border-purple-200 hover:bg-purple-100 dark:bg-purple-900/20 dark:border-purple-700 dark:hover:bg-purple-900/30';
+      case 'individualTodo':
+        return 'bg-blue-50 border-blue-200 hover:bg-blue-100 dark:bg-blue-900/20 dark:border-blue-700 dark:hover:bg-blue-900/30';
+      default:
+        return 'bg-gray-50 border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:border-gray-600 dark:hover:bg-gray-600';
+    }
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  };
+
+  const todaysItems = getTodaysItems();
+  const timeCategories: TimeCategory[] = ['Morning', 'Afternoon', 'Evening', 'Night'];
+
+  if (!user) {
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-center space-y-6 max-w-md">
+          <div className="space-y-4">
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+              Welcome to Podo
+            </h1>
+            <p className="text-lg text-gray-600 dark:text-gray-400">
+              Your personal life organizer for recipes, workouts, and tasks with AI-powered assistance.
+            </p>
+          </div>
+          <div className="p-6 bg-brand-50 border border-brand-200 rounded-xl dark:bg-brand-900/20 dark:border-brand-700">
+            <h3 className="text-lg font-semibold text-brand-900 dark:text-brand-300 mb-2">
+              Ready to Get Started?
+            </h3>
+            <p className="text-brand-700 dark:text-brand-400 text-sm">
+              Sign in to start organizing your schedule and see what's planned for today.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-8">
-      {/* Hero Section */}
-      <div className="text-center space-y-6">
-        <div className="flex items-center justify-center gap-4 mb-6">
-          <img 
-            src={podoLogo} 
-            alt="Podo Logo" 
-            className="h-20 w-20 object-cover rounded-full border-2 border-gray-200 shadow-sm"
-          />
-          <h1 className="text-4xl font-bold text-gray-900">
-            Welcome to Podo
+      {/* Today's Schedule - Main Focus */}
+      <div className="space-y-6">
+        {/* Greeting Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100">
+            {getCurrentTimeGreeting()}, {user.name}! 👋
           </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            {formatDate(new Date())}
+          </p>
         </div>
-        
-        {user ? (
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              {getCurrentTimeGreeting()}, {user.name}! 👋
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Ready to organize your life? Let's make today productive and meaningful.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            <h2 className="text-2xl font-semibold text-gray-800">
-              Your Personal Life Organizer
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Streamline your recipes, workouts, and tasks with AI-powered assistance and smart weekly planning.
-            </p>
-          </div>
-        )}
-      </div>
 
-      {/* Features Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {features.map((feature, index) => (
-          <div key={index} className="card card-interactive p-6">
-            <div className="flex items-start gap-4">
-              <div className={`icon-container ${feature.color}`}>
-                {feature.icon}
-              </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  {feature.title}
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
+        {/* Today's Schedule Card */}
+        <div className="card p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Today's Schedule</h2>
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <Clock className="w-4 h-4" />
+              <span>{todaysItems.length} {todaysItems.length === 1 ? 'item' : 'items'}</span>
             </div>
           </div>
-        ))}
-      </div>
 
-      {user && (
-        <>
-          {/* Quick Actions */}
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-                Quick Actions
+          {todaysItems.length === 0 ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-gray-400 dark:text-gray-500" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
+                No items scheduled for today
               </h3>
-              <p className="text-gray-600">
-                Jump right into creating and organizing
+              <p className="text-gray-600 dark:text-gray-400 mb-6">
+                Start planning your day by adding some items to your schedule.
               </p>
+              <button 
+                onClick={() => onNavigate?.('week')}
+                className="button-primary flex items-center gap-2 mx-auto"
+              >
+                <Plus className="w-4 h-4" />
+                <span>Add Item</span>
+              </button>
             </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {quickActions.map((action, index) => (
-                <button
-                  key={index}
-                  className={`${action.color} text-white p-6 rounded-xl transition-all duration-200 hover:shadow-lg hover:scale-105 group`}
-                >
-                  <div className="flex flex-col items-center text-center space-y-3">
-                    <div className="p-3 bg-white bg-opacity-20 rounded-lg group-hover:bg-opacity-30 transition-all">
-                      {action.icon}
+          ) : (
+            <div className="space-y-6">
+              {timeCategories.map((category) => {
+                const categoryItems = todaysItems.filter(item => item.timeCategory === category);
+                
+                if (categoryItems.length === 0) return null;
+
+                return (
+                  <div key={category} className="space-y-3">
+                    <div className={`text-sm font-semibold px-3 py-1 rounded-full inline-block border ${getTimeCategoryColor(category)}`}>
+                      <Clock className="w-3 h-3 inline mr-1" />
+                      {category}
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-lg">{action.title}</h4>
-                      <p className="text-sm opacity-90">{action.description}</p>
+                    
+                    <div className="space-y-3 pl-4">
+                      {categoryItems.map((scheduledItem) => (
+                        <div
+                          key={scheduledItem.id}
+                          className={`p-4 rounded-xl border transition-all duration-200 ${getItemColor(scheduledItem.objectType)}`}
+                        >
+                          <div className="flex items-start gap-4">
+                            <div className="mt-1">
+                              {getItemIcon(scheduledItem.objectType)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-1">
+                                {scheduledItem.data.type === 'individualTodo' 
+                                  ? (scheduledItem.data as IndividualTodo).text
+                                  : (scheduledItem.data as any).title
+                                }
+                              </h4>
+                              
+                              {/* Item Details */}
+                              {scheduledItem.data.type === 'recipe' && (
+                                <p className="text-sm text-gray-600 dark:text-gray-400">
+                                  {(scheduledItem.data as any).ingredients.length} ingredients
+                                </p>
+                              )}
+                              
+                              {scheduledItem.data.type === 'workout' && (
+                                <div className="space-y-2">
+                                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                                    {(scheduledItem.data as any).exercises.length} exercises
+                                  </p>
+                                  <div className="flex flex-wrap gap-2">
+                                    {(scheduledItem.data as any).exercises.slice(0, 3).map((exercise: any) => (
+                                      <button
+                                        key={exercise.id}
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          toggleItemCompletion(scheduledItem.id, exercise.id);
+                                        }}
+                                        className={`flex items-center gap-2 px-2 py-1 rounded-lg text-xs transition-colors ${
+                                          exercise.completed 
+                                            ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' 
+                                            : 'bg-white border border-gray-200 hover:border-green-300 dark:bg-gray-700 dark:border-gray-600 dark:hover:border-green-500'
+                                        }`}
+                                      >
+                                        <div className={`w-3 h-3 rounded border flex items-center justify-center ${
+                                          exercise.completed 
+                                            ? 'bg-green-500 border-green-500 text-white' 
+                                            : 'border-gray-300 dark:border-gray-500'
+                                        }`}>
+                                          {exercise.completed && <Check className="w-2 h-2" />}
+                                        </div>
+                                        <span className={exercise.completed ? 'line-through' : ''}>
+                                          {exercise.name}
+                                        </span>
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {scheduledItem.data.type === 'todoList' && (
+                                <div className="space-y-2">
+                                  {(scheduledItem.data as any).items.slice(0, 3).map((item: any) => (
+                                    <button
+                                      key={item.id}
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        toggleItemCompletion(scheduledItem.id, item.id);
+                                      }}
+                                      className="flex items-center gap-2 text-sm"
+                                    >
+                                      <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                                        item.completed 
+                                          ? 'bg-green-500 border-green-500 text-white' 
+                                          : 'border-gray-300 hover:border-green-500 dark:border-gray-500 dark:hover:border-green-400'
+                                      }`}>
+                                        {item.completed && <Check className="w-2.5 h-2.5" />}
+                                      </div>
+                                      <span className={`${item.completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-700 dark:text-gray-300'}`}>
+                                        {item.text}
+                                      </span>
+                                    </button>
+                                  ))}
+                                  {(scheduledItem.data as any).items.length > 3 && (
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 ml-6">
+                                      +{(scheduledItem.data as any).items.length - 3} more items
+                                    </p>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {scheduledItem.data.type === 'individualTodo' && (
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    toggleItemCompletion(scheduledItem.id);
+                                  }}
+                                  className={`flex items-center gap-2 text-sm transition-opacity ${
+                                    (scheduledItem.data as IndividualTodo).completed ? 'opacity-60' : ''
+                                  }`}
+                                >
+                                  <div className={`w-4 h-4 rounded border-2 flex items-center justify-center transition-colors ${
+                                    (scheduledItem.data as IndividualTodo).completed 
+                                      ? 'bg-green-500 border-green-500 text-white' 
+                                      : 'border-gray-300 hover:border-green-500 dark:border-gray-500 dark:hover:border-green-400'
+                                  }`}>
+                                    {(scheduledItem.data as IndividualTodo).completed && <Check className="w-2.5 h-2.5" />}
+                                  </div>
+                                  <span className={`${
+                                    (scheduledItem.data as IndividualTodo).completed ? 'line-through text-gray-500 dark:text-gray-400' : 'text-gray-700 dark:text-gray-300'
+                                  }`}>
+                                    {(scheduledItem.data as IndividualTodo).completed ? 'Completed' : 'Mark complete'}
+                                  </span>
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </button>
-              ))}
+                );
+              })}
             </div>
-          </div>
-
-          {/* Stats Overview */}
-          <div className="card p-6">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="icon-container bg-brand-50 border-brand-200 text-brand-600">
-                <Target className="w-6 h-6" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">
-                Your Progress
-              </h3>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-brand mb-1">0</div>
-                <div className="text-sm text-gray-600">Objects Created</div>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-brand mb-1">0</div>
-                <div className="text-sm text-gray-600">Items Scheduled</div>
-              </div>
-              <div className="text-center p-4 bg-gray-50 rounded-xl">
-                <div className="text-2xl font-bold text-brand mb-1">0</div>
-                <div className="text-sm text-gray-600">Tasks Completed</div>
-              </div>
-            </div>
-          </div>
-        </>
-      )}
-
-      {!user && (
-        /* Getting Started for Non-Authenticated Users */
-        <div className="card p-8 text-center">
-          <div className="space-y-6">
-            <div className="icon-container bg-brand-50 border-brand-200 text-brand-600 mx-auto">
-              <Sparkles className="w-8 h-8" />
-            </div>
-            <div>
-              <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-                Ready to Get Started?
-              </h3>
-              <p className="text-gray-600 mb-6 max-w-md mx-auto">
-                Create an account to start organizing your recipes, workouts, and tasks with the power of AI assistance.
-              </p>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <div className="flex items-center gap-2 text-sm text-gray-500">
-                <Clock className="w-4 h-4" />
-                <span>Takes less than 2 minutes</span>
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Tips Section */}
-      <div className="card p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">
-          💡 Pro Tips
+      {/* Navigation Cards - Simplified */}
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 text-center">
+          What would you like to do?
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">Use the AI Assistant</h4>
-            <p className="text-sm text-blue-700">
-              Ask the AI to create recipes, workouts, or todo lists for you. It can even schedule them automatically!
-            </p>
-          </div>
-          <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-            <h4 className="font-medium text-green-900 mb-2">Plan Your Week</h4>
-            <p className="text-sm text-green-700">
-              Drag and drop items into different time slots to create the perfect weekly schedule.
-            </p>
-          </div>
-          <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg">
-            <h4 className="font-medium text-purple-900 mb-2">Track Progress</h4>
-            <p className="text-sm text-purple-700">
-              Check off completed exercises and tasks to see your progress over time.
-            </p>
-          </div>
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg">
-            <h4 className="font-medium text-amber-900 mb-2">Export Your Data</h4>
-            <p className="text-sm text-amber-700">
-              Keep your data safe by regularly exporting backups from the Data Manager.
-            </p>
-          </div>
+        
+        <div className="mobile-grid">
+          <button 
+            onClick={() => onNavigate?.('assistant')}
+            className="card card-interactive p-6 text-left group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="icon-container bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-400">
+                  <Bot className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">AI Assistant</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Get help creating and planning</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+            </div>
+          </button>
+
+          <button 
+            onClick={() => onNavigate?.('week')}
+            className="card card-interactive p-6 text-left group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="icon-container bg-brand-50 border-brand-200 text-brand-600">
+                  <Calendar className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">My Week</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Plan your weekly schedule</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+            </div>
+          </button>
+
+          <button 
+            onClick={() => onNavigate?.('objects')}
+            className="card card-interactive p-6 text-left group"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="icon-container bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-400">
+                  <Package className="w-6 h-6" />
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-900 dark:text-gray-100">My Objects</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">Manage recipes, workouts & todos</p>
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+            </div>
+          </button>
         </div>
       </div>
     </div>

@@ -193,14 +193,15 @@ const MyAssistant: React.FC = () => {
     if (createdCount === 0 && scheduledCount === 0) return null;
 
     return (
-      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-        <div className="flex items-center gap-2 text-green-800">
+      <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-700">
+        <div className="flex items-center gap-2 text-green-800 dark:text-green-300">
           <CheckCircle className="w-4 h-4" />
           <span className="text-sm font-medium">Actions Completed:</span>
         </div>
-        <div className="mt-2 text-sm text-green-700">
-          {createdCount > 0 && <div>• Created {createdCount} new {createdCount === 1 ? 'item' : 'items'}</div>}
-          {scheduledCount > 0 && <div>• Scheduled {scheduledCount} {scheduledCount === 1 ? 'item' : 'items'}</div>}
+        <div className="mt-1 text-sm text-green-700 dark:text-green-400">
+          {createdCount > 0 && `Created ${createdCount} ${createdCount === 1 ? 'item' : 'items'}`}
+          {createdCount > 0 && scheduledCount > 0 && ' • '}
+          {scheduledCount > 0 && `Scheduled ${scheduledCount} ${scheduledCount === 1 ? 'item' : 'items'}`}
         </div>
       </div>
     );
@@ -215,7 +216,7 @@ const MyAssistant: React.FC = () => {
             <img 
               src={podoLogo} 
               alt="Podo Logo" 
-              className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 shadow-sm"
+              className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 dark:border-gray-600 shadow-sm"
             />
             <h2 className="text-heading">My Assistant</h2>
           </div>
@@ -248,12 +249,12 @@ const MyAssistant: React.FC = () => {
       {!aiApiKey && (
         <div className="card p-6">
           <div className="flex items-center gap-4">
-            <div className="icon-container bg-orange-50 border-orange-100 text-orange-600">
+            <div className="icon-container bg-orange-50 border-orange-100 text-orange-600 dark:bg-orange-900/30 dark:border-orange-700 dark:text-orange-400">
               <AlertCircle className="w-6 h-6" />
             </div>
             <div className="flex-1">
-              <h3 className="text-subheading text-orange-900">Setup Required</h3>
-              <p className="text-body text-orange-700 mt-1">
+              <h3 className="text-subheading text-orange-900 dark:text-orange-300">Setup Required</h3>
+              <p className="text-body text-orange-700 dark:text-orange-400 mt-1">
                 Configure your OpenAI API key to enable AI-powered assistance.
               </p>
             </div>
@@ -270,7 +271,7 @@ const MyAssistant: React.FC = () => {
       {/* Chat Interface */}
       <div className="card">
         {/* Messages Area */}
-        <div className="h-96 overflow-y-auto p-6 space-y-4">
+        <div className="h-96 overflow-y-auto p-6 space-y-6 bg-gray-50/50 dark:bg-gray-800/50">
           {messages.map((message) => (
             <div
               key={message.id}
@@ -279,7 +280,7 @@ const MyAssistant: React.FC = () => {
               {message.sender === 'assistant' && (
                 <div className={`icon-container flex-shrink-0 ${
                   message.error 
-                    ? 'bg-red-50 border-red-100 text-red-600' 
+                    ? 'bg-red-50 border-red-100 text-red-600 dark:bg-red-900/30 dark:border-red-700 dark:text-red-400' 
                     : 'bg-brand-50 border-brand-100 text-brand-600'
                 }`}>
                   <Bot className="w-5 h-5" />
@@ -288,12 +289,12 @@ const MyAssistant: React.FC = () => {
               
               <div className={`max-w-xs sm:max-w-md lg:max-w-lg ${message.sender === 'user' ? 'order-first' : ''}`}>
                 <div
-                  className={`p-4 rounded-2xl ${
+                  className={`p-4 rounded-2xl shadow-sm ${
                     message.sender === 'user'
                       ? 'bg-brand text-white'
                       : message.error
-                      ? 'bg-red-50 text-red-900 border border-red-200'
-                      : 'bg-gray-50 text-gray-900'
+                      ? 'bg-red-50 text-red-900 border border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-700'
+                      : 'bg-white text-gray-900 border border-gray-200 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600'
                   }`}
                 >
                   <p className="text-sm leading-relaxed whitespace-pre-line">{message.content}</p>
@@ -309,7 +310,7 @@ const MyAssistant: React.FC = () => {
               </div>
 
               {message.sender === 'user' && (
-                <div className="icon-container bg-gray-50 border-gray-100 text-gray-600 flex-shrink-0">
+                <div className="icon-container bg-gray-50 border-gray-100 text-gray-600 dark:bg-gray-700 dark:border-gray-600 dark:text-gray-400 flex-shrink-0">
                   <User className="w-5 h-5" />
                 </div>
               )}
@@ -322,12 +323,12 @@ const MyAssistant: React.FC = () => {
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 flex-shrink-0">
                 <Bot className="w-5 h-5" />
               </div>
-              <div className="bg-gray-50 text-gray-900 p-4 rounded-2xl">
-                <div className="flex items-center gap-2">
+              <div className="bg-white text-gray-900 dark:bg-gray-700 dark:text-gray-100 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-600">
+                <div className="flex items-center gap-3">
                   <div className="flex space-x-1">
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                    <div className="w-2 h-2 bg-brand rounded-full animate-bounce"></div>
+                    <div className="w-2 h-2 bg-brand rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                    <div className="w-2 h-2 bg-brand rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                   </div>
                   <span className="text-caption">AI is thinking...</span>
                 </div>
@@ -339,7 +340,7 @@ const MyAssistant: React.FC = () => {
         </div>
 
         {/* Input Area */}
-        <div className="border-t border-gray-100 p-6">
+        <div className="border-t border-gray-100 dark:border-gray-700 p-6 bg-white dark:bg-gray-800">
           <div className="flex gap-3">
             <textarea
               value={inputMessage}
@@ -356,7 +357,7 @@ const MyAssistant: React.FC = () => {
             <button
               onClick={handleSendMessage}
               disabled={!inputMessage.trim() || isTyping || !aiApiKey}
-              className="button-primary p-3 disabled:bg-gray-300 disabled:cursor-not-allowed"
+              className="button-primary p-3 disabled:bg-gray-300 disabled:cursor-not-allowed dark:disabled:bg-gray-600"
             >
               <Send className="w-5 h-5" />
             </button>

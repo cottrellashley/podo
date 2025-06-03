@@ -1,26 +1,31 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { ObjectType, ScheduledItem, WeekData, TimeCategory, IndividualTodo } from '../types';
-import { OpenAIService } from '../services/openai';
-import {
-  saveObjects,
-  loadObjects,
-  saveScheduledItems,
-  loadScheduledItems,
-  saveCurrentWeekStart,
+import type { ObjectType, ScheduledItem, TimeCategory, WeekData, IndividualTodo } from '../types';
+import { 
+  saveObjects, 
+  loadObjects, 
+  saveScheduledItems, 
+  loadScheduledItems, 
+  saveCurrentWeekStart, 
   loadCurrentWeekStart,
   saveAISettings,
   loadAISettings,
   exportAppState,
   importAppState,
-  clearAllAppData,
   exportObjectsData,
   exportWeekData,
   exportAnalyticsData,
   importObjectsData,
   importWeekData,
-  importAnalyticsData
+  importAnalyticsData,
+  clearAllAppData,
+  clearUserData
 } from '../utils/storage';
+import { useAuth } from './AuthContext';
+import { OpenAIService } from '../services/openai';
+import { objectsApi } from '../services/api';
+import { weekObjectsApi } from '../services/api';
+import { checkApiHealth } from '../services/api';
 
 interface AppContextType {
   // Objects state
@@ -61,6 +66,11 @@ interface AppContextType {
   exportTabData: (tab: 'objects' | 'week' | 'analytics') => any;
   importTabData: (tab: 'objects' | 'week' | 'analytics', data: any) => boolean;
   
+  // Database sync
+  syncToDatabase: () => Promise<{ success: boolean; error?: string }>;
+  syncFromDatabase: () => Promise<{ success: boolean; error?: string }>;
+  isOnline: boolean;
+  
   // Utility functions
   getWeekData: (weekStart: Date) => WeekData;
   getObjectById: (id: string) => ObjectType | undefined;
@@ -81,12 +91,16 @@ interface AppProviderProps {
 }
 
 export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
-  // Initialize state from localStorage
-  const [objects, setObjects] = useState<ObjectType[]>(() => loadObjects());
-  const [scheduledItems, setScheduledItems] = useState<ScheduledItem[]>(() => loadScheduledItems());
-  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(() => loadCurrentWeekStart());
+  const { user, isOnline: authIsOnline } = useAuth();
+  
+  // Initialize state - will be loaded per user
+  const [objects, setObjects] = useState<ObjectType[]>([]);
+  const [scheduledItems, setScheduledItems] = useState<ScheduledItem[]>([]);
+  const [currentWeekStart, setCurrentWeekStart] = useState<Date>(new Date());
+  const [isOnline, setIsOnline] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(user?.id || null);
 
-  // AI Settings - load from localStorage
+  // AI Settings - load from localStorage (not user-specific)
   const [aiApiKey, setAiApiKey] = useState(() => {
     const { apiKey } = loadAISettings();
     return apiKey;
@@ -103,20 +117,62 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return null;
   });
 
-  // Persist objects to localStorage whenever they change
+  // Load user-specific data when user changes
   useEffect(() => {
-    saveObjects(objects);
-  }, [objects]);
+    if (!user) {
+      // User logged out - clear all data
+      setObjects([]);
+      setScheduledItems([]);
+      setCurrentWeekStart(new Date());
+      setCurrentUserId(null);
+    } else if (currentUserId !== user.id) {
+      // Different user logged in or first time login - load their data
+      setObjects(loadObjects(user.id));
+      setScheduledItems(loadScheduledItems(user.id));
+      setCurrentWeekStart(loadCurrentWeekStart(user.id));
+      setCurrentUserId(user.id);
+    }
+  }, [user, currentUserId]);
 
-  // Persist scheduled items to localStorage whenever they change
+  // Check API availability and sync data when user is authenticated
   useEffect(() => {
-    saveScheduledItems(scheduledItems);
-  }, [scheduledItems]);
+    const checkAndSync = async () => {
+      if (user && authIsOnline) {
+        const apiAvailable = await checkApiHealth();
+        setIsOnline(apiAvailable);
+        
+        if (apiAvailable) {
+          // Auto-sync from database when user logs in
+          await syncFromDatabase();
+        }
+      } else {
+        setIsOnline(false);
+      }
+    };
 
-  // Persist current week start to localStorage whenever it changes
+    checkAndSync();
+  }, [user, authIsOnline]);
+
+  // Persist objects to localStorage whenever they change (user-specific)
   useEffect(() => {
-    saveCurrentWeekStart(currentWeekStart);
-  }, [currentWeekStart]);
+    if (user) {
+      saveObjects(objects, user.id);
+    }
+  }, [objects, user]);
+
+  // Persist scheduled items to localStorage whenever they change (user-specific)
+  useEffect(() => {
+    if (user) {
+      saveScheduledItems(scheduledItems, user.id);
+    }
+  }, [scheduledItems, user]);
+
+  // Persist current week start to localStorage whenever it changes (user-specific)
+  useEffect(() => {
+    if (user) {
+      saveCurrentWeekStart(currentWeekStart, user.id);
+    }
+  }, [currentWeekStart, user]);
 
   // Update OpenAI service when settings change
   useEffect(() => {
@@ -129,14 +185,95 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const generateId = () => Math.random().toString(36).substr(2, 9);
 
-  const addObject = (object: ObjectType) => {
+  // Database sync functions
+  const syncToDatabase = async (): Promise<{ success: boolean; error?: string }> => {
+    if (!user || !isOnline) {
+      return { success: false, error: 'User not authenticated or offline' };
+    }
+
+    try {
+      // Sync objects
+      const objectsResponse = await objectsApi.bulkSync(objects);
+      if (!objectsResponse.success) {
+        return { success: false, error: `Failed to sync objects: ${objectsResponse.error}` };
+      }
+
+      // Sync scheduled items
+      const weekObjectsResponse = await weekObjectsApi.bulkSync(scheduledItems);
+      if (!weekObjectsResponse.success) {
+        return { success: false, error: `Failed to sync week objects: ${weekObjectsResponse.error}` };
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Sync to database failed:', error);
+      return { success: false, error: 'Network error during sync' };
+    }
+  };
+
+  const syncFromDatabase = async (): Promise<{ success: boolean; error?: string }> => {
+    if (!user || !isOnline) {
+      return { success: false, error: 'User not authenticated or offline' };
+    }
+
+    try {
+      // Fetch objects from database
+      const objectsResponse = await objectsApi.getObjects();
+      if (!objectsResponse.success) {
+        return { success: false, error: `Failed to fetch objects: ${objectsResponse.error}` };
+      }
+
+      // Fetch scheduled items from database
+      const weekObjectsResponse = await weekObjectsApi.getWeekObjects();
+      if (!weekObjectsResponse.success) {
+        return { success: false, error: `Failed to fetch week objects: ${weekObjectsResponse.error}` };
+      }
+
+      // Update local state with database data
+      if (objectsResponse.data) {
+        const processedObjects = objectsResponse.data.map(obj => ({
+          ...obj,
+          createdAt: new Date(obj.createdAt)
+        }));
+        setObjects(processedObjects);
+      }
+
+      if (weekObjectsResponse.data) {
+        const processedScheduledItems = weekObjectsResponse.data.map(item => ({
+          ...item,
+          data: {
+            ...item.data,
+            createdAt: new Date(item.data.createdAt)
+          }
+        }));
+        setScheduledItems(processedScheduledItems);
+      }
+
+      return { success: true };
+    } catch (error) {
+      console.error('Sync from database failed:', error);
+      return { success: false, error: 'Network error during sync' };
+    }
+  };
+
+  // Enhanced object operations with database sync
+  const addObject = async (object: ObjectType) => {
     setObjects(prev => {
       const newObjects = [...prev, object];
       return newObjects;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        await objectsApi.createObject(object);
+      } catch (error) {
+        console.error('Failed to sync new object to database:', error);
+      }
+    }
   };
 
-  const updateObject = (id: string, object: ObjectType) => {
+  const updateObject = async (id: string, object: ObjectType) => {
     setObjects(prev => {
       const newObjects = prev.map(obj => obj.id === id ? object : obj);
       return newObjects;
@@ -149,9 +286,18 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       );
       return newScheduledItems;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        await objectsApi.updateObject(object);
+      } catch (error) {
+        console.error('Failed to sync updated object to database:', error);
+      }
+    }
   };
 
-  const deleteObject = (id: string) => {
+  const deleteObject = async (id: string) => {
     setObjects(prev => {
       const newObjects = prev.filter(obj => obj.id !== id);
       return newObjects;
@@ -162,74 +308,126 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       const newScheduledItems = prev.filter(item => item.objectId !== id);
       return newScheduledItems;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        await objectsApi.deleteObject(id);
+      } catch (error) {
+        console.error('Failed to sync deleted object to database:', error);
+      }
+    }
   };
 
-  const addScheduledItem = (item: ScheduledItem) => {
+  // Enhanced scheduled item operations with database sync
+  const addScheduledItem = async (item: ScheduledItem) => {
     setScheduledItems(prev => {
       const newScheduledItems = [...prev, item];
       return newScheduledItems;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        await weekObjectsApi.createWeekObject(item);
+      } catch (error) {
+        console.error('Failed to sync new scheduled item to database:', error);
+      }
+    }
   };
 
-  const updateScheduledItem = (id: string, updates: Partial<ScheduledItem>) => {
+  const updateScheduledItem = async (id: string, updates: Partial<ScheduledItem>) => {
     setScheduledItems(prev => {
       const newScheduledItems = prev.map(item => 
         item.id === id ? { ...item, ...updates } : item
       );
       return newScheduledItems;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        const updatedItem = scheduledItems.find(item => item.id === id);
+        if (updatedItem) {
+          await weekObjectsApi.updateWeekObject({ ...updatedItem, ...updates });
+        }
+      } catch (error) {
+        console.error('Failed to sync updated scheduled item to database:', error);
+      }
+    }
   };
 
-  const deleteScheduledItem = (id: string) => {
+  const deleteScheduledItem = async (id: string) => {
     setScheduledItems(prev => {
       const newScheduledItems = prev.filter(item => item.id !== id);
       return newScheduledItems;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        await weekObjectsApi.deleteWeekObject(id);
+      } catch (error) {
+        console.error('Failed to sync deleted scheduled item to database:', error);
+      }
+    }
   };
 
   const moveScheduledItem = (id: string, newDate: string, newTimeCategory: TimeCategory, newOrder: number) => {
-    setScheduledItems(prev => {
-      const newScheduledItems = prev.map(item => 
-        item.id === id 
-          ? { ...item, date: newDate, timeCategory: newTimeCategory, order: newOrder }
-          : item
-      );
-      return newScheduledItems;
-    });
+    updateScheduledItem(id, { date: newDate, timeCategory: newTimeCategory, order: newOrder });
   };
 
   const toggleItemCompletion = (scheduledItemId: string, itemId?: string) => {
     setScheduledItems(prev => {
       const newScheduledItems = prev.map(scheduledItem => {
-        if (scheduledItem.id !== scheduledItemId) return scheduledItem;
-
-        const data = { ...scheduledItem.data };
-        
-        if (data.type === 'individualTodo') {
-          (data as IndividualTodo).completed = !(data as IndividualTodo).completed;
-        } else if (data.type === 'todoList' && itemId) {
-          const todoList = data as any;
-          todoList.items = todoList.items.map((item: any) => 
-            item.id === itemId ? { ...item, completed: !item.completed } : item
-          );
-        } else if (data.type === 'workout' && itemId) {
-          const workout = data as any;
-          workout.exercises = workout.exercises.map((exercise: any) => 
-            exercise.id === itemId ? { ...exercise, completed: !exercise.completed } : exercise
-          );
+        if (scheduledItem.id === scheduledItemId) {
+          const updatedData = { ...scheduledItem.data };
+          
+          if (scheduledItem.objectType === 'workout' && itemId) {
+            // Toggle exercise completion
+            const workout = updatedData as any;
+            workout.exercises = workout.exercises.map((exercise: any) => 
+              exercise.id === itemId 
+                ? { ...exercise, completed: !exercise.completed }
+                : exercise
+            );
+          } else if (scheduledItem.objectType === 'todoList' && itemId) {
+            // Toggle todo item completion
+            const todoList = updatedData as any;
+            todoList.items = todoList.items.map((item: any) => 
+              item.id === itemId 
+                ? { ...item, completed: !item.completed }
+                : item
+            );
+          } else if (scheduledItem.objectType === 'individualTodo') {
+            // Toggle individual todo completion
+            const individualTodo = updatedData as IndividualTodo;
+            individualTodo.completed = !individualTodo.completed;
+          }
+          
+          return { ...scheduledItem, data: updatedData };
         }
-
-        return { ...scheduledItem, data };
+        return scheduledItem;
       });
       return newScheduledItems;
     });
+
+    // Sync to database if online
+    if (user && isOnline) {
+      try {
+        const updatedItem = scheduledItems.find(item => item.id === scheduledItemId);
+        if (updatedItem) {
+          weekObjectsApi.updateWeekObject(updatedItem);
+        }
+      } catch (error) {
+        console.error('Failed to sync completion toggle to database:', error);
+      }
+    }
   };
 
   const setAISettings = (apiKey: string, model: string) => {
     setAiApiKey(apiKey);
     setAiModel(model);
-    
-    // Save to localStorage
     saveAISettings(apiKey, model);
   };
 
@@ -237,68 +435,44 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     newObjects?: ObjectType[], 
     scheduleItems?: Array<{objectId: string, date: string, timeCategory: TimeCategory}>
   ) => {
-    // Add new objects
     if (newObjects && newObjects.length > 0) {
-      newObjects.forEach(obj => {
-        // Ensure the object has a proper createdAt date
-        const objectWithDate = {
-          ...obj,
-          createdAt: new Date(obj.createdAt)
-        };
-        addObject(objectWithDate);
+      setObjects(prev => {
+        const existingIds = new Set(prev.map(obj => obj.id));
+        const uniqueNewObjects = newObjects.filter(obj => !existingIds.has(obj.id));
+        return [...prev, ...uniqueNewObjects];
       });
     }
 
-    // Schedule items
     if (scheduleItems && scheduleItems.length > 0) {
-      scheduleItems.forEach(scheduleRequest => {
-        // Find the object to schedule (either from new objects or existing ones)
-        const objectToSchedule = newObjects?.find(obj => obj.id === scheduleRequest.objectId) ||
-                                 objects.find(obj => obj.id === scheduleRequest.objectId);
-        
-        if (objectToSchedule) {
-          const scheduledItem: ScheduledItem = {
-            id: generateId(),
-            objectId: scheduleRequest.objectId,
-            objectType: objectToSchedule.type,
-            date: scheduleRequest.date,
-            timeCategory: scheduleRequest.timeCategory,
-            order: 1, // Will be adjusted by the system
-            data: objectToSchedule
-          };
-          
-          addScheduledItem(scheduledItem);
+      const newScheduledItems: ScheduledItem[] = scheduleItems.map(item => {
+        const objectData = objects.find(obj => obj.id === item.objectId);
+        if (!objectData) {
+          throw new Error(`Object with id ${item.objectId} not found`);
         }
+
+        return {
+          id: generateId(),
+          objectId: item.objectId,
+          objectType: objectData.type,
+          date: item.date,
+          timeCategory: item.timeCategory,
+          order: 0,
+          data: objectData
+        };
       });
+
+      setScheduledItems(prev => [...prev, ...newScheduledItems]);
     }
   };
 
-  // Data management functions
   const exportData = () => {
     return exportAppState();
   };
 
   const importData = (data: any): boolean => {
-    try {
-      const success = importAppState(data);
-      if (success) {
-        // Reload state from localStorage after import
-        setObjects(loadObjects());
-        setScheduledItems(loadScheduledItems());
-        setCurrentWeekStart(loadCurrentWeekStart());
-        
-        const { apiKey, model } = loadAISettings();
-        setAiApiKey(apiKey);
-        setAiModel(model);
-      }
-      return success;
-    } catch (error) {
-      console.error('Failed to import data:', error);
-      return false;
-    }
+    return importAppState(data);
   };
 
-  // Tab-specific data management functions
   const exportTabData = (tab: 'objects' | 'week' | 'analytics') => {
     switch (tab) {
       case 'objects':
@@ -308,74 +482,39 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       case 'analytics':
         return exportAnalyticsData();
       default:
-        return exportAppState();
+        return null;
     }
   };
 
   const importTabData = (tab: 'objects' | 'week' | 'analytics', data: any): boolean => {
     try {
-      let success = false;
-      
       switch (tab) {
         case 'objects':
-          success = importObjectsData(data);
-          if (success) {
-            setObjects(loadObjects());
-          }
-          break;
+          return importObjectsData(data);
         case 'week':
-          success = importWeekData(data);
-          if (success) {
-            setScheduledItems(loadScheduledItems());
-            setCurrentWeekStart(loadCurrentWeekStart());
-          }
-          break;
+          return importWeekData(data);
         case 'analytics':
-          success = importAnalyticsData(data);
-          if (success) {
-            setObjects(loadObjects());
-            setScheduledItems(loadScheduledItems());
-            setCurrentWeekStart(loadCurrentWeekStart());
-          }
-          break;
+          return importAnalyticsData(data);
         default:
-          success = importAppState(data);
-          if (success) {
-            setObjects(loadObjects());
-            setScheduledItems(loadScheduledItems());
-            setCurrentWeekStart(loadCurrentWeekStart());
-            const { apiKey, model } = loadAISettings();
-            setAiApiKey(apiKey);
-            setAiModel(model);
-          }
+          return false;
       }
-      
-      return success;
     } catch (error) {
-      console.error('Failed to import tab data:', error);
+      console.error(`Error importing ${tab} data:`, error);
       return false;
     }
   };
 
   const clearAllData = () => {
-    try {
+    setObjects([]);
+    setScheduledItems([]);
+    setCurrentWeekStart(new Date());
+    
+    if (user) {
+      // Clear user-specific data
+      clearUserData(user.id);
+    } else {
+      // Clear all app data if no user is logged in
       clearAllAppData();
-      
-      // Reset state to defaults
-      setObjects([]);
-      setScheduledItems([]);
-      setCurrentWeekStart(() => {
-        const today = new Date();
-        const monday = new Date(today);
-        monday.setDate(today.getDate() - today.getDay() + 1);
-        monday.setHours(0, 0, 0, 0);
-        return monday;
-      });
-      setAiApiKey('');
-      setAiModel('gpt-4o-mini');
-      setOpenAIService(null);
-    } catch (error) {
-      console.error('Failed to clear all data:', error);
     }
   };
 
@@ -385,14 +524,14 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     for (let i = 0; i < 7; i++) {
       const date = new Date(weekStart);
       date.setDate(weekStart.getDate() + i);
-      const dateStr = date.toISOString().split('T')[0];
+      const dateString = date.toISOString().split('T')[0];
       
-      weekData[dateStr] = scheduledItems
-        .filter(item => item.date === dateStr)
+      weekData[dateString] = scheduledItems
+        .filter(item => item.date === dateString)
         .sort((a, b) => {
-          const categoryOrder = { Morning: 0, Afternoon: 1, Evening: 2, Night: 3 };
-          const categoryDiff = categoryOrder[a.timeCategory] - categoryOrder[b.timeCategory];
-          return categoryDiff !== 0 ? categoryDiff : a.order - b.order;
+          const timeOrder = { 'Morning': 0, 'Afternoon': 1, 'Evening': 2, 'Night': 3 };
+          const timeComparison = timeOrder[a.timeCategory] - timeOrder[b.timeCategory];
+          return timeComparison !== 0 ? timeComparison : a.order - b.order;
         });
     }
     
@@ -428,8 +567,11 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     clearAllData,
     exportTabData,
     importTabData,
+    syncToDatabase,
+    syncFromDatabase,
+    isOnline,
     getWeekData,
-    getObjectById
+    getObjectById,
   };
 
   return (

@@ -143,28 +143,29 @@ const MyAnalytics: React.FC = () => {
       </div>
 
       {/* Section Navigation */}
-      <div className="card p-2">
-        <div className="flex">
-          {[
-            { id: 'shopping', label: 'Shopping List', icon: <ShoppingCart className="w-5 h-5" /> },
-            { id: 'workout', label: 'Workout Stats', icon: <Dumbbell className="w-5 h-5" /> },
-            { id: 'todo', label: 'Todo Stats', icon: <CheckSquare className="w-5 h-5" /> }
-          ].map((section, index) => (
-            <button
-              key={section.id}
-              onClick={() => setActiveSection(section.id as any)}
-              className={`px-6 py-3 font-medium text-sm transition-all duration-200 ${
-                activeSection === section.id 
-                  ? 'bg-brand text-white shadow-sm' 
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              } ${index === 0 ? 'rounded-l-xl' : ''} ${index === 2 ? 'rounded-r-xl' : ''}`}
-            >
-              <div className="flex items-center justify-center gap-2">
-                {section.icon}
-                <span className="hidden sm:inline">{section.label}</span>
-              </div>
-            </button>
-          ))}
+      <div className="tab-nav-container">
+        <div className="tab-nav-card">
+          <div className="tab-nav-buttons">
+            {[
+              { id: 'shopping', label: 'Shopping List', icon: <ShoppingCart className="w-5 h-5" /> },
+              { id: 'workout', label: 'Workout Stats', icon: <Dumbbell className="w-5 h-5" /> },
+              { id: 'todo', label: 'Todo Stats', icon: <CheckSquare className="w-5 h-5" /> }
+            ].map((section) => (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id as any)}
+                className={`tab-nav-button ${
+                  activeSection === section.id ? 'active' : 'inactive'
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  {section.icon}
+                  <span className="hidden sm:inline whitespace-nowrap">{section.label}</span>
+                  <span className="sm:hidden text-xs">{section.label.split(' ')[0]}</span>
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -172,26 +173,26 @@ const MyAnalytics: React.FC = () => {
       {activeSection === 'shopping' && (
         <div className="space-y-6">
           {/* Shopping Summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="mobile-grid">
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <ShoppingCart className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{shoppingData.items.length}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{shoppingData.items.length}</div>
               <div className="text-caption">Unique Items</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <DollarSign className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">${shoppingData.totalCost.toFixed(2)}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">${shoppingData.totalCost.toFixed(2)}</div>
               <div className="text-caption">Estimated Cost</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <Calendar className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">
                 {Object.values(weekData).flat().filter(item => item.data.type === 'recipe').length}
               </div>
               <div className="text-caption">Recipes Planned</div>
@@ -204,32 +205,32 @@ const MyAnalytics: React.FC = () => {
             {shoppingData.items.length > 0 ? (
               <div className="space-y-4">
                 {shoppingData.items.map((item, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                     <div className="flex items-center gap-4">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <div>
-                        <span className="font-medium text-gray-900">{item.name}</span>
-                        <p className="text-sm text-gray-600">
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{item.name}</span>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">
                           {item.totalAmount} {item.unit}
                         </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="font-medium text-gray-900">${item.estimatedCost.toFixed(2)}</span>
+                      <span className="font-medium text-gray-900 dark:text-gray-100">${item.estimatedCost.toFixed(2)}</span>
                     </div>
                   </div>
                 ))}
-                <div className="border-t border-gray-200 pt-4 mt-6">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-4 mt-6">
                   <div className="flex items-center justify-between text-lg font-bold">
-                    <span>Total Estimated Cost:</span>
-                    <span className="text-green-600">${shoppingData.totalCost.toFixed(2)}</span>
+                    <span className="text-gray-900 dark:text-gray-100">Total Estimated Cost:</span>
+                    <span className="text-green-600 dark:text-green-400">${shoppingData.totalCost.toFixed(2)}</span>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="icon-container bg-gray-50 border-gray-100 mx-auto mb-4">
-                  <ShoppingCart className="w-8 h-8 text-gray-400" />
+                <div className="icon-container bg-gray-50 border-gray-100 dark:bg-gray-700 dark:border-gray-600 mx-auto mb-4">
+                  <ShoppingCart className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                 </div>
                 <h4 className="text-subheading mb-2">No recipes scheduled</h4>
                 <p className="text-body">Schedule some recipes in your week to generate a shopping list</p>
@@ -243,26 +244,26 @@ const MyAnalytics: React.FC = () => {
       {activeSection === 'workout' && (
         <div className="space-y-6">
           {/* Workout Summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="mobile-grid">
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <Dumbbell className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{workoutStats.totalWorkouts}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{workoutStats.totalWorkouts}</div>
               <div className="text-caption">Total Workouts</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <Calendar className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{workoutStats.daysWithWorkouts}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{workoutStats.daysWithWorkouts}</div>
               <div className="text-caption">Days with Workouts</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{workoutStats.totalExercises}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{workoutStats.totalExercises}</div>
               <div className="text-caption">Total Exercises</div>
             </div>
           </div>
@@ -274,13 +275,13 @@ const MyAnalytics: React.FC = () => {
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Weekly Progress</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Weekly Progress</h4>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Workout Frequency</span>
-                        <span className="font-medium">{workoutStats.daysWithWorkouts}/7 days</span>
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Workout Frequency</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">{workoutStats.daysWithWorkouts}/7 days</span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                         <div 
                           className="bg-brand h-3 rounded-full transition-all duration-500"
                           style={{ width: `${(workoutStats.daysWithWorkouts / 7) * 100}%` }}
@@ -289,15 +290,15 @@ const MyAnalytics: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Exercise Intensity</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Exercise Intensity</h4>
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-gray-600">Avg Exercises per Workout</span>
-                        <span className="font-medium">
+                        <span className="text-sm text-gray-600 dark:text-gray-400">Avg Exercises per Workout</span>
+                        <span className="font-medium text-gray-900 dark:text-gray-100">
                           {workoutStats.totalWorkouts > 0 ? Math.round(workoutStats.totalExercises / workoutStats.totalWorkouts) : 0}
                         </span>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-3">
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3">
                         <div 
                           className="bg-green-500 h-3 rounded-full transition-all duration-500"
                           style={{ width: `${Math.min((workoutStats.totalExercises / workoutStats.totalWorkouts / 10) * 100, 100)}%` }}
@@ -307,33 +308,33 @@ const MyAnalytics: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="border-t border-gray-200 pt-6">
+                <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                     <div>
-                      <div className="text-2xl font-bold text-blue-600">{workoutStats.totalWorkouts}</div>
-                      <div className="text-xs text-gray-600">Workouts</div>
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{workoutStats.totalWorkouts}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Workouts</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-green-600">{workoutStats.daysWithWorkouts}</div>
-                      <div className="text-xs text-gray-600">Active Days</div>
+                      <div className="text-2xl font-bold text-green-600 dark:text-green-400">{workoutStats.daysWithWorkouts}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Active Days</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-purple-600">{workoutStats.totalExercises}</div>
-                      <div className="text-xs text-gray-600">Exercises</div>
+                      <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{workoutStats.totalExercises}</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Exercises</div>
                     </div>
                     <div>
-                      <div className="text-2xl font-bold text-orange-600">
+                      <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">
                         {Math.round((workoutStats.daysWithWorkouts / 7) * 100)}%
                       </div>
-                      <div className="text-xs text-gray-600">Consistency</div>
+                      <div className="text-xs text-gray-600 dark:text-gray-400">Consistency</div>
                     </div>
                   </div>
                 </div>
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="icon-container bg-gray-50 border-gray-100 mx-auto mb-4">
-                  <Dumbbell className="w-8 h-8 text-gray-400" />
+                <div className="icon-container bg-gray-50 border-gray-100 dark:bg-gray-700 dark:border-gray-600 mx-auto mb-4">
+                  <Dumbbell className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                 </div>
                 <h4 className="text-subheading mb-2">No workouts scheduled</h4>
                 <p className="text-body">Schedule some workouts in your week to see your fitness stats</p>
@@ -347,33 +348,33 @@ const MyAnalytics: React.FC = () => {
       {activeSection === 'todo' && (
         <div className="space-y-6">
           {/* Todo Summary */}
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <CheckSquare className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{todoStats.totalTodos}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{todoStats.totalTodos}</div>
               <div className="text-caption">Total Todos</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <CheckSquare className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{todoStats.completedTodos}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{todoStats.completedTodos}</div>
               <div className="text-caption">Completed</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <Clock className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{todoStats.pendingTodos}</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{todoStats.pendingTodos}</div>
               <div className="text-caption">Pending</div>
             </div>
             <div className="card p-6 text-center">
               <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 mx-auto mb-4">
                 <TrendingUp className="w-6 h-6" />
               </div>
-              <div className="text-3xl font-bold text-gray-900 mb-2">{todoStats.completionPercentage}%</div>
+              <div className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">{todoStats.completionPercentage}%</div>
               <div className="text-caption">Completion Rate</div>
             </div>
           </div>
@@ -385,10 +386,10 @@ const MyAnalytics: React.FC = () => {
               <div className="space-y-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-lg font-medium text-gray-900">Overall Progress</span>
-                    <span className="text-lg font-bold text-blue-600">{todoStats.completionPercentage}%</span>
+                    <span className="text-lg font-medium text-gray-900 dark:text-gray-100">Overall Progress</span>
+                    <span className="text-lg font-bold text-blue-600 dark:text-blue-400">{todoStats.completionPercentage}%</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-6">
+                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-6">
                     <div 
                       className="bg-gradient-to-r from-blue-500 to-green-500 h-6 rounded-full transition-all duration-700 flex items-center justify-center"
                       style={{ width: `${todoStats.completionPercentage}%` }}
@@ -402,37 +403,37 @@ const MyAnalytics: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Completion Breakdown</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Completion Breakdown</h4>
                     <div className="space-y-3">
-                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-4 h-4 bg-green-500 rounded-full"></div>
-                          <span className="text-sm font-medium">Completed</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Completed</span>
                         </div>
-                        <span className="font-bold text-green-600">{todoStats.completedTodos}</span>
+                        <span className="font-bold text-green-600 dark:text-green-400">{todoStats.completedTodos}</span>
                       </div>
-                      <div className="flex items-center justify-between p-3 bg-orange-50 rounded-lg">
+                      <div className="flex items-center justify-between p-3 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
                         <div className="flex items-center gap-3">
                           <div className="w-4 h-4 bg-orange-500 rounded-full"></div>
-                          <span className="text-sm font-medium">Pending</span>
+                          <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Pending</span>
                         </div>
-                        <span className="font-bold text-orange-600">{todoStats.pendingTodos}</span>
+                        <span className="font-bold text-orange-600 dark:text-orange-400">{todoStats.pendingTodos}</span>
                       </div>
                     </div>
                   </div>
                   
                   <div className="space-y-4">
-                    <h4 className="font-medium text-gray-900">Productivity Insights</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100">Productivity Insights</h4>
                     <div className="space-y-3">
-                      <div className="p-3 bg-brand-50 rounded-lg">
-                        <div className="text-sm text-gray-600">Daily Average</div>
-                        <div className="font-bold text-blue-600">
+                      <div className="p-3 bg-brand-50 dark:bg-brand-900/20 rounded-lg">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Daily Average</div>
+                        <div className="font-bold text-blue-600 dark:text-blue-400">
                           {Math.round(todoStats.totalTodos / 7)} todos/day
                         </div>
                       </div>
-                      <div className="p-3 bg-purple-50 rounded-lg">
-                        <div className="text-sm text-gray-600">Completion Rate</div>
-                        <div className="font-bold text-purple-600">
+                      <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Completion Rate</div>
+                        <div className="font-bold text-purple-600 dark:text-purple-400">
                           {todoStats.completionPercentage >= 80 ? 'Excellent' : 
                            todoStats.completionPercentage >= 60 ? 'Good' : 
                            todoStats.completionPercentage >= 40 ? 'Fair' : 'Needs Improvement'}
@@ -444,8 +445,8 @@ const MyAnalytics: React.FC = () => {
               </div>
             ) : (
               <div className="text-center py-12">
-                <div className="icon-container bg-gray-50 border-gray-100 mx-auto mb-4">
-                  <CheckSquare className="w-8 h-8 text-gray-400" />
+                <div className="icon-container bg-gray-50 border-gray-100 dark:bg-gray-700 dark:border-gray-600 mx-auto mb-4">
+                  <CheckSquare className="w-8 h-8 text-gray-400 dark:text-gray-500" />
                 </div>
                 <h4 className="text-subheading mb-2">No todos scheduled</h4>
                 <p className="text-body">Schedule some todos in your week to track your productivity</p>

@@ -40,19 +40,19 @@ const AISettings: React.FC<AISettingsProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-md w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 dark:bg-black dark:bg-opacity-70">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl border border-gray-200 dark:border-gray-700">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
-              <div className="icon-container bg-brand-50 border-brand-100 text-brand-600">
+              <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 dark:bg-brand-900/30 dark:border-brand-700 dark:text-brand-400">
                 <Settings className="w-5 h-5" />
               </div>
               <h3 className="text-subheading">AI Assistant Settings</h3>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <X className="w-6 h-6" />
             </button>
@@ -61,7 +61,7 @@ const AISettings: React.FC<AISettingsProps> = ({
           <div className="space-y-6">
             {/* API Key */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 OpenAI API Key *
               </label>
               <div className="relative">
@@ -75,18 +75,18 @@ const AISettings: React.FC<AISettingsProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowApiKey(!showApiKey)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
                 >
                   {showApiKey ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                 Get your API key from{' '}
                 <a 
                   href="https://platform.openai.com/api-keys" 
                   target="_blank" 
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-800"
+                  className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 transition-colors"
                 >
                   OpenAI Platform
                 </a>
@@ -95,7 +95,7 @@ const AISettings: React.FC<AISettingsProps> = ({
 
             {/* Model Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">
                 Model
               </label>
               <div className="space-y-2">
@@ -105,17 +105,23 @@ const AISettings: React.FC<AISettingsProps> = ({
                     onClick={() => setModel(modelOption.id)}
                     className={`w-full p-4 rounded-lg border text-left transition-all ${
                       model === modelOption.id
-                        ? 'border-blue-500 bg-blue-50 text-blue-700'
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                        ? 'border-blue-500 bg-blue-50 text-blue-700 dark:border-blue-400 dark:bg-blue-900/30 dark:text-blue-300'
+                        : 'border-gray-200 hover:border-gray-300 text-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:text-gray-300 dark:bg-gray-700/50 dark:hover:bg-gray-700'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">{modelOption.name}</div>
-                        <div className="text-sm opacity-75">{modelOption.description}</div>
+                        <div className={`text-sm ${
+                          model === modelOption.id 
+                            ? 'text-blue-600 dark:text-blue-400' 
+                            : 'text-gray-500 dark:text-gray-400'
+                        }`}>
+                          {modelOption.description}
+                        </div>
                       </div>
                       {model === modelOption.id && (
-                        <Check className="w-5 h-5 text-blue-600" />
+                        <Check className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                       )}
                     </div>
                   </button>
@@ -124,9 +130,9 @@ const AISettings: React.FC<AISettingsProps> = ({
             </div>
 
             {/* Warning */}
-            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <p className="text-sm text-yellow-800">
-                <strong>Note:</strong> Your API key is stored locally in your browser and never sent to our servers. 
+            <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg dark:bg-yellow-900/20 dark:border-yellow-700">
+              <p className="text-sm text-yellow-800 dark:text-yellow-300">
+                <strong className="text-yellow-900 dark:text-yellow-200">Note:</strong> Your API key is stored locally in your browser and never sent to our servers. 
                 It's only used to communicate directly with OpenAI's API.
               </p>
             </div>

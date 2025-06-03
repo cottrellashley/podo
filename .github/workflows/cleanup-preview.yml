@@ -1,0 +1,35 @@
+name: Cleanup Preview Deployment
+
+on:
+  pull_request:
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete Preview App
+        uses: digitalocean/app_action/delete@v2
+        with:
+          from_pr_preview: "true"
+          ignore_not_found: "true"
+          token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+      - name: Comment PR on Cleanup
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `🧹 **Preview Environment Cleaned Up**
+              
+              The preview deployment for this PR has been automatically deleted.
+              
+              ---
+              *Cleanup completed at: ${new Date().toISOString()}*`
+            }) 

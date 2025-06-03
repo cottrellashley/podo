@@ -118,21 +118,21 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-2xl max-w-md w-full">
+    <div className="fixed inset-0 bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center p-4 z-50 dark:bg-black dark:bg-opacity-70">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full shadow-2xl border border-gray-200 dark:border-gray-700">
         <div className="p-6">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <img 
                 src={podoLogo} 
                 alt="Podo Logo" 
-                className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 shadow-sm"
+                className="h-10 w-10 object-cover rounded-full border-2 border-gray-200 dark:border-gray-600 shadow-sm"
               />
               <h3 className="text-subheading">Data Management - {getTabDisplayName()}</h3>
             </div>
             <button
               onClick={onClose}
-              className="p-2 text-gray-400 hover:text-gray-600"
+              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               <X className="w-6 h-6" />
             </button>
@@ -142,17 +142,17 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
           {importStatus !== 'idle' && (
             <div className={`p-4 rounded-lg mb-6 ${
               importStatus === 'success' 
-                ? 'bg-green-50 border border-green-200' 
-                : 'bg-red-50 border border-red-200'
+                ? 'bg-green-50 border border-green-200 dark:bg-green-900/20 dark:border-green-700' 
+                : 'bg-red-50 border border-red-200 dark:bg-red-900/20 dark:border-red-700'
             }`}>
               <div className="flex items-center gap-2">
                 {importStatus === 'success' ? (
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
                 ) : (
-                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                  <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400" />
                 )}
                 <span className={`text-sm font-medium ${
-                  importStatus === 'success' ? 'text-green-800' : 'text-red-800'
+                  importStatus === 'success' ? 'text-green-800 dark:text-green-300' : 'text-red-800 dark:text-red-300'
                 }`}>
                   {importMessage}
                 </span>
@@ -162,10 +162,10 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
 
           {/* Assistant Tab Notice */}
           {!isDataManagementAvailable && (
-            <div className="p-4 rounded-lg mb-6 bg-brand-50 border border-brand-200">
+            <div className="p-4 rounded-lg mb-6 bg-brand-50 border border-brand-200 dark:bg-brand-900/20 dark:border-brand-700">
               <div className="flex items-center gap-2">
-                <AlertTriangle className="w-5 h-5 text-brand-600" />
-                <span className="text-sm font-medium text-brand-800">
+                <AlertTriangle className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                <span className="text-sm font-medium text-brand-800 dark:text-brand-300">
                   Chat conversations are stored locally in your browser session and are not included in data backups.
                 </span>
               </div>
@@ -175,14 +175,14 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
           <div className="space-y-4">
             {/* Export Data */}
             {isDataManagementAvailable && (
-              <div className="p-4 border border-gray-200 rounded-lg">
+              <div className="p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50">
                 <div className="flex items-start gap-4">
-                  <div className="icon-container bg-brand-50 border-brand-100 text-brand-600">
+                  <div className="icon-container bg-brand-50 border-brand-100 text-brand-600 dark:bg-brand-900/30 dark:border-brand-700 dark:text-brand-400">
                     <Download className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 mb-2">Export Data</h4>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Export Data</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                       Download a backup of your {getTabDescription()}.
                     </p>
                     <button
@@ -198,14 +198,14 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
 
             {/* Import Data */}
             {isDataManagementAvailable && (
-              <div className="p-4 border border-gray-200 rounded-lg">
+              <div className="p-4 border border-gray-200 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700/50">
                 <div className="flex items-start gap-4">
-                  <div className="icon-container bg-green-50 border-green-100 text-green-600">
+                  <div className="icon-container bg-green-50 border-green-100 text-green-600 dark:bg-green-900/30 dark:border-green-700 dark:text-green-400">
                     <Upload className="w-5 h-5" />
                   </div>
                   <div className="flex-1">
-                    <h4 className="font-medium text-gray-900 mb-2">Import Data</h4>
-                    <p className="text-sm text-gray-600 mb-4">
+                    <h4 className="font-medium text-gray-900 dark:text-gray-100 mb-2">Import Data</h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                       Restore your {getTabDescription()} from a previously exported backup file.
                     </p>
                     <label className="button-secondary text-sm cursor-pointer inline-block">
@@ -223,16 +223,16 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
             )}
 
             {/* Clear All Data */}
-            <div className="p-4 border border-red-200 rounded-lg bg-red-50">
+            <div className="p-4 border border-red-200 dark:border-red-700 rounded-lg bg-red-50 dark:bg-red-900/20">
               <div className="flex items-start gap-4">
-                <div className="icon-container bg-red-100 border-red-200 text-red-600">
+                <div className="icon-container bg-red-100 border-red-200 text-red-600 dark:bg-red-900/30 dark:border-red-700 dark:text-red-400">
                   <Trash2 className="w-5 h-5" />
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-medium text-red-900 mb-2">
+                  <h4 className="font-medium text-red-900 dark:text-red-300 mb-2">
                     {currentTab === 'assistant' ? 'Clear Chat History' : 'Clear All Data'}
                   </h4>
-                  <p className="text-sm text-red-700 mb-4">
+                  <p className="text-sm text-red-700 dark:text-red-400 mb-4">
                     {currentTab === 'assistant' 
                       ? 'Chat conversations are stored in your browser session and will be cleared when you refresh the page.'
                       : `Permanently delete all your data including ${getTabDescription()}.`
@@ -241,20 +241,20 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
                   {!showClearConfirm ? (
                     <button
                       onClick={() => setShowClearConfirm(true)}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                      className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed dark:disabled:bg-gray-600"
                       disabled={currentTab === 'assistant'}
                     >
                       {currentTab === 'assistant' ? 'No Action Needed' : 'Clear All Data'}
                     </button>
                   ) : (
                     <div className="space-y-3">
-                      <p className="text-sm font-medium text-red-800">
+                      <p className="text-sm font-medium text-red-800 dark:text-red-300">
                         Are you sure? This action cannot be undone.
                       </p>
                       <div className="flex gap-2">
                         <button
                           onClick={handleClearData}
-                          className="bg-red-600 hover:bg-red-700 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                          className="bg-red-600 hover:bg-red-700 dark:bg-red-700 dark:hover:bg-red-600 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors"
                         >
                           Yes, Delete All
                         </button>
@@ -273,9 +273,9 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
           </div>
 
           {/* Info */}
-          <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-            <p className="text-sm text-gray-600">
-              <strong>Note:</strong> {
+          <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600">
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              <strong className="text-gray-900 dark:text-gray-200">Note:</strong> {
                 currentTab === 'assistant' 
                   ? 'Chat conversations are stored locally in your browser session and are automatically cleared when you refresh the page or close the browser.'
                   : `Your ${getTabDescription()} are stored locally in your browser. Regular backups are recommended to prevent data loss.`

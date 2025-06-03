@@ -1,6 +1,6 @@
 import type { ObjectType, ScheduledItem } from '../types';
 
-// Storage keys
+// Storage keys - now user-specific
 export const STORAGE_KEYS = {
   OBJECTS: 'podo_objects',
   SCHEDULED_ITEMS: 'podo_scheduled_items',
@@ -10,6 +10,14 @@ export const STORAGE_KEYS = {
   ASSISTANT_MESSAGES: 'podo_assistant_messages',
   ASSISTANT_CONVERSATION_HISTORY: 'podo_assistant_conversation_history'
 } as const;
+
+// Helper function to create user-specific storage keys
+const getUserStorageKey = (baseKey: string, userId?: string): string => {
+  if (!userId) {
+    return baseKey; // Fallback to non-user-specific key
+  }
+  return `${baseKey}_${userId}`;
+};
 
 // Serialization helpers
 export const serializeDate = (date: Date): string => {
@@ -55,24 +63,26 @@ export const removeStorageItem = (key: string): boolean => {
   }
 };
 
-// Specific storage functions for app data
-export const saveObjects = (objects: ObjectType[]): boolean => {
+// Specific storage functions for app data - now user-specific
+export const saveObjects = (objects: ObjectType[], userId?: string): boolean => {
   const serializedObjects = objects.map(obj => ({
     ...obj,
     createdAt: serializeDate(obj.createdAt)
   }));
-  return setStorageItem(STORAGE_KEYS.OBJECTS, serializedObjects);
+  const key = getUserStorageKey(STORAGE_KEYS.OBJECTS, userId);
+  return setStorageItem(key, serializedObjects);
 };
 
-export const loadObjects = (): ObjectType[] => {
-  const serializedObjects = getStorageItem<any[]>(STORAGE_KEYS.OBJECTS, []);
+export const loadObjects = (userId?: string): ObjectType[] => {
+  const key = getUserStorageKey(STORAGE_KEYS.OBJECTS, userId);
+  const serializedObjects = getStorageItem<any[]>(key, []);
   return serializedObjects.map(obj => ({
     ...obj,
     createdAt: deserializeDate(obj.createdAt)
   }));
 };
 
-export const saveScheduledItems = (items: ScheduledItem[]): boolean => {
+export const saveScheduledItems = (items: ScheduledItem[], userId?: string): boolean => {
   const serializedItems = items.map(item => ({
     ...item,
     data: {
@@ -80,11 +90,13 @@ export const saveScheduledItems = (items: ScheduledItem[]): boolean => {
       createdAt: serializeDate(item.data.createdAt)
     }
   }));
-  return setStorageItem(STORAGE_KEYS.SCHEDULED_ITEMS, serializedItems);
+  const key = getUserStorageKey(STORAGE_KEYS.SCHEDULED_ITEMS, userId);
+  return setStorageItem(key, serializedItems);
 };
 
-export const loadScheduledItems = (): ScheduledItem[] => {
-  const serializedItems = getStorageItem<any[]>(STORAGE_KEYS.SCHEDULED_ITEMS, []);
+export const loadScheduledItems = (userId?: string): ScheduledItem[] => {
+  const key = getUserStorageKey(STORAGE_KEYS.SCHEDULED_ITEMS, userId);
+  const serializedItems = getStorageItem<any[]>(key, []);
   return serializedItems.map(item => ({
     ...item,
     data: {
@@ -94,12 +106,14 @@ export const loadScheduledItems = (): ScheduledItem[] => {
   }));
 };
 
-export const saveCurrentWeekStart = (date: Date): boolean => {
-  return setStorageItem(STORAGE_KEYS.CURRENT_WEEK_START, serializeDate(date));
+export const saveCurrentWeekStart = (date: Date, userId?: string): boolean => {
+  const key = getUserStorageKey(STORAGE_KEYS.CURRENT_WEEK_START, userId);
+  return setStorageItem(key, serializeDate(date));
 };
 
-export const loadCurrentWeekStart = (): Date => {
-  const dateString = getStorageItem<string | null>(STORAGE_KEYS.CURRENT_WEEK_START, null);
+export const loadCurrentWeekStart = (userId?: string): Date => {
+  const key = getUserStorageKey(STORAGE_KEYS.CURRENT_WEEK_START, userId);
+  const dateString = getStorageItem<string | null>(key, null);
   if (dateString) {
     return deserializeDate(dateString);
   }
@@ -125,31 +139,32 @@ export const loadAISettings = (): { apiKey: string; model: string } => {
 };
 
 // Assistant conversation persistence
-export const saveAssistantMessages = (messages: any[]): boolean => {
+export const saveAssistantMessages = (messages: any[], userId?: string): boolean => {
   const serializedMessages = messages.map(msg => ({
     ...msg,
     timestamp: serializeDate(msg.timestamp)
   }));
-  return setStorageItem(STORAGE_KEYS.ASSISTANT_MESSAGES, serializedMessages);
+  const key = getUserStorageKey(STORAGE_KEYS.ASSISTANT_MESSAGES, userId);
+  return setStorageItem(key, serializedMessages);
 };
 
-export const loadAssistantMessages = (): any[] => {
-  const serializedMessages = getStorageItem<any[]>(STORAGE_KEYS.ASSISTANT_MESSAGES, []);
+export const loadAssistantMessages = (userId?: string): any[] => {
+  const key = getUserStorageKey(STORAGE_KEYS.ASSISTANT_MESSAGES, userId);
+  const serializedMessages = getStorageItem<any[]>(key, []);
   return serializedMessages.map(msg => ({
     ...msg,
     timestamp: deserializeDate(msg.timestamp)
   }));
 };
 
-export const saveConversationHistory = (history: Array<{ role: 'user' | 'assistant'; content: string }>): boolean => {
-  return setStorageItem(STORAGE_KEYS.ASSISTANT_CONVERSATION_HISTORY, history);
+export const saveConversationHistory = (history: Array<{ role: 'user' | 'assistant'; content: string }>, userId?: string): boolean => {
+  const key = getUserStorageKey(STORAGE_KEYS.ASSISTANT_CONVERSATION_HISTORY, userId);
+  return setStorageItem(key, history);
 };
 
-export const loadConversationHistory = (): Array<{ role: 'user' | 'assistant'; content: string }> => {
-  return getStorageItem<Array<{ role: 'user' | 'assistant'; content: string }>>(
-    STORAGE_KEYS.ASSISTANT_CONVERSATION_HISTORY, 
-    []
-  );
+export const loadConversationHistory = (userId?: string): Array<{ role: 'user' | 'assistant'; content: string }> => {
+  const key = getUserStorageKey(STORAGE_KEYS.ASSISTANT_CONVERSATION_HISTORY, userId);
+  return getStorageItem<Array<{ role: 'user' | 'assistant'; content: string }>>(key, []);
 };
 
 // Clear all app data (useful for reset functionality)
@@ -161,6 +176,28 @@ export const clearAllAppData = (): boolean => {
     return true;
   } catch (error) {
     console.error('Failed to clear app data:', error);
+    return false;
+  }
+};
+
+// Clear user-specific data
+export const clearUserData = (userId: string): boolean => {
+  try {
+    const userSpecificKeys = [
+      STORAGE_KEYS.OBJECTS,
+      STORAGE_KEYS.SCHEDULED_ITEMS,
+      STORAGE_KEYS.CURRENT_WEEK_START,
+      STORAGE_KEYS.ASSISTANT_MESSAGES,
+      STORAGE_KEYS.ASSISTANT_CONVERSATION_HISTORY
+    ];
+    
+    userSpecificKeys.forEach(baseKey => {
+      const userKey = getUserStorageKey(baseKey, userId);
+      localStorage.removeItem(userKey);
+    });
+    return true;
+  } catch (error) {
+    console.error('Failed to clear user data:', error);
     return false;
   }
 };

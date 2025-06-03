@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  database:
+    image: postgres:15-alpine
+    container_name: podo-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-podo}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - podo-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-podo}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API Server
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: podo-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: ${NODE_ENV:-production}
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@database:5432/${DB_NAME:-podo}?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+      CORS_ORIGINS: http://localhost,http://localhost:80,http://localhost:3000,http://frontend
+    ports:
+      - "3001:3001"
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - podo-network
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  # Frontend React App
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: podo-frontend
+    restart: unless-stopped
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - podo-network
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  podo-network:
+    driver: bridge 

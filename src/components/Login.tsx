@@ -118,13 +118,28 @@ const Login: React.FC = () => {
       }
 
       if (result.success) {
-        setSuccess(isLogin ? 'Login successful!' : 'Account created successfully!');
+        setSuccess(isLogin ? 'Login successful! Redirecting...' : 'Account created successfully! Redirecting...');
         // The auth context will handle the redirect
       } else {
-        setError(result.error || 'An unexpected error occurred');
+        // Handle specific error messages from the server
+        let errorMessage = result.error || 'An unexpected error occurred';
+        
+        // Provide user-friendly error messages
+        if (errorMessage.includes('User with this email already exists')) {
+          errorMessage = 'An account with this email already exists. Please try logging in instead.';
+        } else if (errorMessage.includes('Invalid email or password')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (errorMessage.includes('Password must be at least 8 characters')) {
+          errorMessage = 'Password must be at least 8 characters long and contain uppercase, lowercase, and numbers.';
+        } else if (errorMessage.includes('Network error') || errorMessage.includes('Failed to fetch')) {
+          errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
+        }
+        
+        setError(errorMessage);
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      console.error('Authentication error:', err);
+      setError('Unable to connect to the server. Please check your internet connection and try again.');
     } finally {
       setIsLoading(false);
     }
@@ -139,18 +154,18 @@ const Login: React.FC = () => {
   };
 
   const getInputClassName = (fieldName: string) => {
-    const baseClass = "w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-brand focus:border-brand transition-colors";
+    const baseClass = "w-full pl-12 pr-4 py-3 border rounded-xl focus:ring-2 focus:ring-brand focus:border-brand transition-colors dark:bg-gray-800 dark:text-gray-100";
     const hasError = fieldErrors[fieldName];
     
     if (hasError) {
-      return `${baseClass} border-red-300 focus:ring-red-500 focus:border-red-500`;
+      return `${baseClass} border-red-300 focus:ring-red-500 focus:border-red-500 dark:border-red-600`;
     }
     
-    return `${baseClass} border-gray-300`;
+    return `${baseClass} border-gray-300 dark:border-gray-600`;
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center p-4 transition-colors">
       <div className="max-w-md w-full">
         {/* Header */}
         <div className="text-center mb-8">
@@ -158,14 +173,14 @@ const Login: React.FC = () => {
             <img 
               src={podoLogo} 
               alt="Podo Logo" 
-              className="h-16 w-16 object-cover rounded-full border-2 border-gray-200 shadow-sm"
+              className="h-16 w-16 object-cover rounded-full border-2 border-gray-200 dark:border-gray-600 shadow-sm"
             />
-            <h1 className="text-2xl font-bold text-gray-900">Podo</h1>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Podo</h1>
           </div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-2">
             {isLogin ? 'Welcome back!' : 'Create your account'}
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             {isLogin 
               ? 'Sign in to access your personal organizer' 
               : 'Join Podo to start organizing your life'
@@ -179,11 +194,11 @@ const Login: React.FC = () => {
             {/* Name field (register only) */}
             {!isLogin && (
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type="text"
                     id="name"
@@ -197,7 +212,7 @@ const Login: React.FC = () => {
                   />
                 </div>
                 {fieldErrors.name && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {fieldErrors.name}
                   </p>
@@ -207,11 +222,11 @@ const Login: React.FC = () => {
 
             {/* Email field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type="email"
                   id="email"
@@ -226,7 +241,7 @@ const Login: React.FC = () => {
                 />
               </div>
               {fieldErrors.email && (
-                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" />
                   {fieldErrors.email}
                 </p>
@@ -235,11 +250,11 @@ const Login: React.FC = () => {
 
             {/* Password field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   id="password"
@@ -255,14 +270,14 @@ const Login: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400"
                   disabled={isLoading}
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {fieldErrors.password && (
-                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" />
                   {fieldErrors.password}
                 </p>
@@ -272,11 +287,11 @@ const Login: React.FC = () => {
             {/* Confirm Password field (register only) */}
             {!isLogin && (
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Confirm Password
                 </label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500" />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     id="confirmPassword"
@@ -291,7 +306,7 @@ const Login: React.FC = () => {
                   />
                 </div>
                 {fieldErrors.confirmPassword && (
-                  <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <p className="mt-2 text-sm text-red-600 dark:text-red-400 flex items-center gap-1">
                     <AlertCircle className="w-4 h-4" />
                     {fieldErrors.confirmPassword}
                   </p>
@@ -301,8 +316,8 @@ const Login: React.FC = () => {
 
             {/* Error/Success Messages */}
             {error && (
-              <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-red-600 flex items-center gap-2">
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg dark:bg-red-900/20 dark:border-red-800">
+                <p className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
                   <AlertCircle className="w-4 h-4" />
                   {error}
                 </p>
@@ -310,8 +325,8 @@ const Login: React.FC = () => {
             )}
 
             {success && (
-              <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-                <p className="text-sm text-green-600 flex items-center gap-2">
+              <div className="p-4 bg-green-50 border border-green-200 rounded-lg dark:bg-green-900/20 dark:border-green-800">
+                <p className="text-sm text-green-600 dark:text-green-400 flex items-center gap-2">
                   <CheckCircle className="w-4 h-4" />
                   {success}
                 </p>
@@ -334,7 +349,7 @@ const Login: React.FC = () => {
 
           {/* Toggle Mode */}
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-gray-600 dark:text-gray-400">
               {isLogin ? "Don't have an account?" : "Already have an account?"}
               {' '}
               <button
@@ -351,7 +366,7 @@ const Login: React.FC = () => {
 
         {/* Security Notice */}
         <div className="mt-6 text-center">
-          <p className="text-xs text-gray-500">
+          <p className="text-xs text-gray-500 dark:text-gray-400">
             Your data is stored securely and encrypted. We never share your personal information.
           </p>
         </div>
