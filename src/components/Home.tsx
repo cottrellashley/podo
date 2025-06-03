@@ -310,55 +310,55 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
         <div className="mobile-grid">
           <button 
             onClick={() => onNavigate?.('assistant')}
-            className="card card-interactive p-6 text-left group"
+            className="card card-interactive p-4 text-left group"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="icon-container bg-amber-50 border-amber-200 text-amber-600 dark:bg-amber-900/30 dark:border-amber-700 dark:text-amber-400">
-                  <Bot className="w-6 h-6" />
+                  <Bot className="w-5 h-5" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100">AI Assistant</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Get help creating and planning</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Get help creating and planning</p>
                 </div>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
             </div>
           </button>
 
           <button 
             onClick={() => onNavigate?.('week')}
-            className="card card-interactive p-6 text-left group"
+            className="card card-interactive p-4 text-left group"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="icon-container bg-brand-50 border-brand-200 text-brand-600">
-                  <Calendar className="w-6 h-6" />
+                  <Calendar className="w-5 h-5" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100">My Week</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Plan your weekly schedule</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Plan your weekly schedule</p>
                 </div>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
             </div>
           </button>
 
           <button 
             onClick={() => onNavigate?.('objects')}
-            className="card card-interactive p-6 text-left group"
+            className="card card-interactive p-4 text-left group"
           >
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
                 <div className="icon-container bg-emerald-50 border-emerald-200 text-emerald-600 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-400">
-                  <Package className="w-6 h-6" />
+                  <Package className="w-5 h-5" />
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900 dark:text-gray-100">My Objects</h4>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Manage recipes, workouts & todos</p>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">Manage recipes, workouts & todos</p>
                 </div>
               </div>
-              <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
+              <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-gray-600 dark:text-gray-500 dark:group-hover:text-gray-400 transition-colors" />
             </div>
           </button>
         </div>

@@ -56,34 +56,34 @@ function AppContent() {
     {
       id: 'home',
       label: 'Home',
-      icon: <HomeIcon className="w-6 h-6" />,
+      icon: <HomeIcon className="w-4 h-4" />,
       component: <Home onNavigate={(tab) => handleTabClick(tab)} />
     },
     {
       id: 'objects',
       label: 'My Objects',
-      icon: <Package className="w-6 h-6" />,
+      icon: <Package className="w-4 h-4" />,
       component: <MyObjects onOpenDataManager={() => setShowDataManager(true)} />,
       requiresAuth: true
     },
     {
       id: 'week',
       label: 'My Week',
-      icon: <Calendar className="w-6 h-6" />,
+      icon: <Calendar className="w-4 h-4" />,
       component: <MyWeek onOpenDataManager={() => setShowDataManager(true)} />,
       requiresAuth: true
     },
     {
       id: 'analytics',
       label: 'My Analytics',
-      icon: <BarChart3 className="w-6 h-6" />,
+      icon: <BarChart3 className="w-4 h-4" />,
       component: <MyAnalytics />,
       requiresAuth: true
     },
     {
       id: 'assistant',
       label: 'My Assistant',
-      icon: <Bot className="w-6 h-6" />,
+      icon: <Bot className="w-4 h-4" />,
       component: <MyAssistant />,
       requiresAuth: true
     }
@@ -114,34 +114,34 @@ function AppContent() {
       )}
 
       {/* Sidebar */}
-      <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg transition-all duration-300 ease-in-out z-50 ${
+      <div className={`bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-all duration-300 ease-in-out z-50 ${
         sidebarOpen 
-          ? 'fixed lg:relative w-64 h-full lg:h-auto' 
+          ? 'fixed lg:relative sidebar-compact h-full lg:h-auto' 
           : 'w-0 lg:w-0'
       } overflow-hidden`}>
         {/* Sidebar Header */}
-        <div className="flex items-center justify-between h-16 sm:h-20 px-4 sm:px-6 border-b border-gray-100 dark:border-gray-700">
+        <div className="sidebar-header-compact flex items-center justify-between">
           <button
             onClick={() => handleTabClick('home')}
-            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+            className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img 
               src={podoLogo} 
               alt="Podo Logo" 
-              className="h-10 w-10 sm:h-12 sm:w-12 object-cover rounded-full border-2 border-gray-200 dark:border-gray-600 shadow-sm"
+              className="h-7 w-7 object-cover rounded-full border border-gray-200 dark:border-gray-600"
             />
-            <span className="text-lg sm:text-xl font-bold text-gray-900 dark:text-gray-100">Podo</span>
+            <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">Podo</span>
           </button>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-1 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 sm:px-4 py-4 sm:py-6 space-y-1 sm:space-y-2">
+        <nav className="sidebar-nav-compact">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -152,22 +152,21 @@ function AppContent() {
                   setSidebarOpen(false);
                 }
               }}
-              className={`w-full flex items-center gap-3 sm:gap-4 px-3 sm:px-4 py-3 text-left rounded-xl font-medium transition-all duration-200 ${
-                activeTab === tab.id 
-                  ? 'bg-brand text-white shadow-sm' 
-                  : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+              className={`sidebar-nav-item ${
+                activeTab === tab.id ? 'active' : 'inactive'
               }`}
             >
-              {tab.icon}
-              <span className="text-sm sm:text-base">{tab.label}</span>
+              <div className="w-4 h-4 flex-shrink-0 flex items-center justify-center">
+                {tab.icon}
+              </div>
+              <span className="truncate">{tab.label}</span>
             </button>
           ))}
         </nav>
 
         {/* User Section */}
         {user && (
-          <div className="border-t border-gray-200 dark:border-gray-700 p-3 sm:p-4">
-            {/* Clickable User Info */}
+          <div className="sidebar-user-compact">
             <button
               onClick={() => {
                 handleTabClick('profile');
@@ -176,16 +175,16 @@ function AppContent() {
                   setSidebarOpen(false);
                 }
               }}
-              className={`w-full px-3 sm:px-4 py-3 bg-gray-50 dark:bg-gray-700 rounded-xl hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-200 ${
-                activeTab === 'profile' ? 'ring-2 ring-brand' : ''
+              className={`sidebar-user-button ${
+                activeTab === 'profile' ? 'ring-1 ring-brand' : ''
               }`}
             >
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center">
-                  <User className="w-4 h-4 text-brand-600" />
+              <div className="flex items-center gap-2">
+                <div className="w-6 h-6 bg-brand-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="w-3 h-3 text-brand-600" />
                 </div>
                 <div className="flex-1 min-w-0 text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
+                  <p className="text-xs font-medium text-gray-900 dark:text-gray-100 truncate">
                     {user.name}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
@@ -201,29 +200,29 @@ function AppContent() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header with Hamburger Menu */}
-        <header className="bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4">
+        <header className="bg-white dark:bg-gray-800 header-compact border-b border-gray-100 dark:border-gray-700">
+          <div className="flex items-center justify-between h-full">
             {/* Hamburger Menu Button */}
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded transition-colors"
             >
-              <Menu className="w-6 h-6" />
+              <Menu className="w-5 h-5" />
             </button>
 
             {/* Page Title */}
-            <h2 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-gray-100 truncate">
+            <h2 className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">
               {activeTab === 'profile' ? 'Profile' : activeTabData?.label}
             </h2>
 
             {/* Spacer */}
-            <div className="w-10"></div>
+            <div className="w-8"></div>
           </div>
         </header>
 
         {/* Main Content Area */}
         <main className="flex-1 overflow-auto">
-          <div className="content-container">
+          <div className="content-container-compact">
             {renderTabContent()}
           </div>
         </main>

@@ -233,33 +233,33 @@ const MyWeek: React.FC<MyWeekProps> = ({ onOpenDataManager }) => {
         </div>
 
         {/* Enhanced Week Navigation */}
-        <div className="card p-3">
+        <div className="card p-2.5">
           <div className="flex items-center justify-between">
             <button 
               onClick={() => navigateWeek('prev')}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              style={{ minHeight: '44px', minWidth: '44px' }}
+              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              style={{ minHeight: '36px', minWidth: '36px' }}
               aria-label="Previous week"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4" />
             </button>
             
             <div className="text-center">
-              <h3 className="text-base font-semibold text-gray-900">
+              <h3 className="text-sm font-semibold text-gray-900">
                 {getCurrentWeekRange()}
               </h3>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-gray-500 mt-0.5">
                 Week {Math.ceil((currentWeekStart.getTime() - new Date(currentWeekStart.getFullYear(), 0, 1).getTime()) / (7 * 24 * 60 * 60 * 1000))}
               </p>
             </div>
             
             <button 
               onClick={() => navigateWeek('next')}
-              className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-              style={{ minHeight: '44px', minWidth: '44px' }}
+              className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+              style={{ minHeight: '36px', minWidth: '36px' }}
               aria-label="Next week"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -290,7 +290,7 @@ const MyWeek: React.FC<MyWeekProps> = ({ onOpenDataManager }) => {
                     }`}>
                       {weekDays[index]}
                     </div>
-                    <div className={`text-xl font-bold mt-1 ${
+                    <div className={`text-lg font-bold mt-0.5 ${
                       todayClass ? 'text-brand-900' : 'text-gray-900'
                     }`}>
                       {date.getDate()}
@@ -304,15 +304,15 @@ const MyWeek: React.FC<MyWeekProps> = ({ onOpenDataManager }) => {
                       setSelectedDate(dateStr);
                       setShowAddModal(true);
                     }}
-                    className={`p-2 rounded-lg transition-colors ${
+                    className={`p-1.5 rounded-lg transition-colors ${
                       todayClass 
                         ? 'hover:bg-brand-200 text-brand-600' 
                         : 'hover:bg-gray-100 text-gray-400'
                     }`}
-                    style={{ minHeight: '44px', minWidth: '44px' }}
+                    style={{ minHeight: '36px', minWidth: '36px' }}
                     aria-label={`Add item to ${weekDaysFull[index]}`}
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>

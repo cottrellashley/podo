@@ -21,14 +21,15 @@
     -moz-osx-font-smoothing: grayscale;
     /* Prevent zoom on iOS when focusing inputs */
     -webkit-text-size-adjust: 100%;
+    font-size: 14px; /* Smaller base font size */
   }
   
   body {
     margin: 0;
     padding: 0;
     min-height: 100vh;
-    background-color: #f2f2f7;
-    color: #1c1c1e;
+    background-color: #f6f8fa; /* GitHub-style background */
+    color: #24292f;
     line-height: 1.4;
     letter-spacing: -0.003em;
     /* Prevent horizontal scroll on mobile */
@@ -46,16 +47,16 @@
   @media (max-width: 640px) {
     html {
       /* Prevent zoom on input focus for iOS */
-      font-size: 16px;
+      font-size: 14px;
     }
   }
 }
 
 @layer components {
   .tab-button {
-    @apply flex-1 py-2 px-3 text-center font-medium text-sm transition-all duration-200 ease-out;
-    min-height: 44px;
-    min-width: 44px;
+    @apply flex-1 py-1.5 px-2 text-center font-medium text-xs transition-all duration-200 ease-out;
+    min-height: 36px;
+    min-width: 36px;
   }
   
   .tab-button.active {
@@ -69,18 +70,18 @@
   }
   
   .content-container {
-    @apply p-3 sm:p-4 max-w-7xl mx-auto;
+    @apply p-2 sm:p-3 max-w-7xl mx-auto;
     /* Ensure content doesn't touch screen edges on mobile */
-    min-height: calc(100vh - 100px);
+    min-height: calc(100vh - 80px);
   }
 
   .button-primary {
     background-color: rgb(117, 148, 145);
-    @apply text-white font-medium rounded-xl transition-all duration-150 ease-out shadow-sm hover:shadow-md;
-    min-height: 44px;
-    min-width: 44px;
-    padding: 10px 14px;
-    font-size: 15px;
+    @apply text-white font-medium rounded-lg transition-all duration-150 ease-out shadow-sm hover:shadow-md;
+    min-height: 36px;
+    min-width: 36px;
+    padding: 8px 12px;
+    font-size: 13px;
     line-height: 1.2;
   }
   
@@ -94,12 +95,12 @@
   }
 
   .button-secondary {
-    @apply bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-medium rounded-xl border border-gray-200 transition-all duration-150 ease-out shadow-sm hover:shadow-md;
+    @apply bg-white hover:bg-gray-50 active:bg-gray-100 text-gray-700 font-medium rounded-lg border border-gray-200 transition-all duration-150 ease-out shadow-sm hover:shadow-md;
     @apply dark:bg-gray-800 dark:hover:bg-gray-700 dark:active:bg-gray-600 dark:text-gray-300 dark:border-gray-600;
-    min-height: 44px;
-    min-width: 44px;
-    padding: 10px 14px;
-    font-size: 15px;
+    min-height: 36px;
+    min-width: 36px;
+    padding: 8px 12px;
+    font-size: 13px;
     line-height: 1.2;
   }
 
@@ -110,16 +111,16 @@
   .button-danger {
     @apply text-red-500 hover:text-red-600 active:text-red-700 hover:bg-red-50 active:bg-red-100 rounded-lg transition-all duration-150 ease-out;
     @apply dark:text-red-400 dark:hover:text-red-300 dark:active:text-red-200 dark:hover:bg-red-900/20 dark:active:bg-red-900/30;
-    min-height: 44px;
-    min-width: 44px;
-    padding: 10px;
+    min-height: 36px;
+    min-width: 36px;
+    padding: 8px;
   }
 
   .input-field {
-    @apply w-full px-3 py-2.5 border border-gray-200 rounded-xl transition-all duration-150 ease-out bg-white;
+    @apply w-full px-2.5 py-2 border border-gray-200 rounded-lg transition-all duration-150 ease-out bg-white;
     @apply dark:bg-gray-800 dark:border-gray-600 dark:text-gray-100;
-    min-height: 44px;
-    font-size: 16px;
+    min-height: 36px;
+    font-size: 14px;
     line-height: 1.3;
   }
   
@@ -134,7 +135,7 @@
   }
 
   .card {
-    @apply bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all duration-200 ease-out;
+    @apply bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-all duration-200 ease-out;
     @apply dark:bg-gray-800 dark:border-gray-700 dark:hover:shadow-lg;
   }
 
@@ -148,32 +149,32 @@
   }
 
   .modal-content {
-    @apply bg-white rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-gray-200;
+    @apply bg-white rounded-xl max-w-xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200;
     @apply dark:bg-gray-800 dark:border-gray-700;
   }
 
   .icon-container {
-    @apply p-2 rounded-lg flex items-center justify-center;
-    min-height: 36px;
-    min-width: 36px;
+    @apply p-1.5 rounded-lg flex items-center justify-center;
+    min-height: 28px;
+    min-width: 28px;
   }
 
   .text-heading {
-    @apply text-lg sm:text-xl font-bold text-gray-900;
+    @apply text-base font-bold text-gray-900;
     @apply dark:text-gray-100;
     line-height: 1.2;
     letter-spacing: -0.022em;
   }
 
   .text-subheading {
-    @apply text-base font-semibold text-gray-900;
+    @apply text-sm font-semibold text-gray-900;
     @apply dark:text-gray-200;
     line-height: 1.3;
     letter-spacing: -0.017em;
   }
 
   .text-body {
-    @apply text-sm text-gray-600;
+    @apply text-xs text-gray-600;
     @apply dark:text-gray-400;
     line-height: 1.4;
     letter-spacing: -0.003em;
@@ -190,26 +191,26 @@
   }
 
   .form-section {
-    @apply space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700;
+    @apply space-y-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700;
   }
 
   .form-group {
-    @apply space-y-2;
+    @apply space-y-1.5;
   }
 
   .form-label {
-    @apply text-sm font-medium text-gray-900 dark:text-white;
+    @apply text-xs font-medium text-gray-900 dark:text-white;
     line-height: 1.2;
   }
 
   .dynamic-list-item {
-    @apply bg-white dark:bg-gray-900 rounded-lg p-3 border border-gray-200 dark:border-gray-700 shadow-sm;
+    @apply bg-white dark:bg-gray-900 rounded-lg p-2.5 border border-gray-200 dark:border-gray-700 shadow-sm;
   }
 
   .add-button {
-    @apply flex items-center gap-2 px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors shadow-sm;
-    min-height: 44px;
-    font-size: 14px;
+    @apply flex items-center gap-1.5 px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium transition-colors shadow-sm;
+    min-height: 36px;
+    font-size: 13px;
   }
 
   .add-button:hover {
@@ -221,11 +222,11 @@
   }
 
   .mobile-grid {
-    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3;
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5;
   }
 
   .mobile-flex {
-    @apply flex flex-col sm:flex-row gap-3;
+    @apply flex flex-col sm:flex-row gap-2.5;
   }
 
   .tab-nav-container {
@@ -233,7 +234,7 @@
   }
 
   .tab-nav-card {
-    @apply bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-1 shadow-sm;
+    @apply bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-1 shadow-sm;
     min-width: fit-content;
   }
 
@@ -246,8 +247,8 @@
   }
 
   .tab-nav-button {
-    @apply px-3 py-2 rounded-lg font-medium text-sm transition-all duration-200 whitespace-nowrap;
-    min-height: 44px;
+    @apply px-2.5 py-1.5 rounded-md font-medium text-xs transition-all duration-200 whitespace-nowrap;
+    min-height: 36px;
   }
 
   .tab-nav-button.active {
@@ -261,11 +262,11 @@
 
   /* Compact spacing utilities */
   .space-compact > * + * {
-    margin-top: 0.75rem;
+    margin-top: 0.5rem;
   }
 
   .space-compact-sm > * + * {
-    margin-top: 0.5rem;
+    margin-top: 0.375rem;
   }
 
   .space-compact-xs > * + * {
@@ -274,64 +275,64 @@
 
   /* Apple-style section headers */
   .section-header {
-    @apply flex items-center justify-between mb-3;
+    @apply flex items-center justify-between mb-2.5;
   }
 
   .section-title {
-    @apply text-base font-semibold text-gray-900 dark:text-white;
+    @apply text-sm font-semibold text-gray-900 dark:text-white;
     line-height: 1.2;
   }
 
   /* Compact section header with inline plus */
   .section-header-compact {
-    @apply flex items-center gap-2 mb-2;
+    @apply flex items-center gap-1.5 mb-1.5;
   }
 
   .section-title-compact {
-    @apply text-sm font-medium text-gray-700 dark:text-gray-300;
+    @apply text-xs font-medium text-gray-700 dark:text-gray-300;
     line-height: 1.2;
   }
 
   .section-add-button {
-    @apply w-6 h-6 rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer;
-    min-height: 24px;
-    min-width: 24px;
+    @apply w-5 h-5 rounded bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 flex items-center justify-center text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 transition-all duration-200 cursor-pointer;
+    min-height: 20px;
+    min-width: 20px;
   }
 
   /* Compact modal styles */
   .modal-header {
-    @apply sticky top-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 p-4;
+    @apply sticky top-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-b border-gray-100 dark:border-gray-800 p-3;
   }
 
   .modal-body {
-    @apply p-4 space-y-4;
+    @apply p-3 space-y-3;
   }
 
   .modal-footer {
-    @apply sticky bottom-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800 p-4;
+    @apply sticky bottom-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800 p-3;
   }
 
   /* Week view optimizations */
   .week-day-card {
     @apply card transition-all duration-200;
-    min-height: 300px;
-  }
-
-  .week-day-header {
-    @apply p-3 border-b border-gray-100 dark:border-gray-700;
-  }
-
-  .week-day-content {
-    @apply p-3 space-y-3;
     min-height: 250px;
   }
 
+  .week-day-header {
+    @apply p-2.5 border-b border-gray-100 dark:border-gray-700;
+  }
+
+  .week-day-content {
+    @apply p-2.5 space-y-2.5;
+    min-height: 200px;
+  }
+
   .time-category-badge {
-    @apply text-xs font-medium px-2 py-1 rounded-full inline-flex items-center gap-1;
+    @apply text-xs font-medium px-1.5 py-0.5 rounded-full inline-flex items-center gap-1;
   }
 
   .scheduled-item {
-    @apply p-2.5 rounded-lg border transition-all duration-200 cursor-pointer;
+    @apply p-2 rounded-lg border transition-all duration-200 cursor-pointer;
   }
 
   /* Brand colors with dark mode support */
@@ -433,5 +434,50 @@
 
   .dark .text-brand-400 {
     color: rgb(135, 165, 162);
+  }
+
+  /* GitHub-style compact sidebar */
+  .sidebar-compact {
+    width: 220px; /* GitHub-like width */
+  }
+
+  .sidebar-header-compact {
+    @apply h-12 px-3 border-b border-gray-100 dark:border-gray-700;
+  }
+
+  .sidebar-nav-compact {
+    @apply px-2 py-3 space-y-1;
+  }
+
+  .sidebar-nav-item {
+    @apply w-full flex items-center gap-2 px-2 py-1.5 text-left rounded-md font-normal text-sm transition-all duration-150;
+    min-height: 32px;
+  }
+
+  .sidebar-nav-item.active {
+    @apply bg-brand text-white shadow-sm;
+  }
+
+  .sidebar-nav-item.inactive {
+    @apply text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700;
+  }
+
+  .sidebar-user-compact {
+    @apply border-t border-gray-200 dark:border-gray-700 p-2;
+  }
+
+  .sidebar-user-button {
+    @apply w-full px-2 py-2 bg-gray-50 dark:bg-gray-700 rounded-md hover:bg-gray-100 dark:hover:bg-gray-600 transition-all duration-150;
+  }
+
+  /* Compact header */
+  .header-compact {
+    @apply h-12 px-3 border-b border-gray-100 dark:border-gray-700;
+  }
+
+  /* Compact content container */
+  .content-container-compact {
+    @apply p-3 max-w-7xl mx-auto;
+    min-height: calc(100vh - 48px); /* Adjusted for smaller header */
   }
 }

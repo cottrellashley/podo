@@ -346,30 +346,30 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
       {/* Objects Grid */}
       <div className="mobile-grid">
         {filteredObjects.map((object) => (
-          <div key={object.id} className="card card-interactive p-4">
-            <div className="flex items-start justify-between mb-3">
+          <div key={object.id} className="card card-interactive p-3">
+            <div className="flex items-start justify-between mb-2.5">
               <div className={`icon-container ${getObjectColor(object.type)}`}>
                 {getObjectIcon(object.type)}
               </div>
-              <div className="flex gap-1">
+              <div className="flex gap-0.5">
                 <button
                   onClick={() => handleEditObject(object)}
-                  className="p-2 text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400 transition-colors rounded-lg"
-                  style={{ minHeight: '44px', minWidth: '44px' }}
+                  className="p-1.5 text-gray-400 hover:text-blue-600 dark:text-gray-500 dark:hover:text-blue-400 transition-colors rounded-lg"
+                  style={{ minHeight: '36px', minWidth: '36px' }}
                 >
-                  <Edit className="w-4 h-4" />
+                  <Edit className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={() => deleteObject(object.id)}
-                  className="p-2 text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400 transition-colors rounded-lg"
-                  style={{ minHeight: '44px', minWidth: '44px' }}
+                  className="p-1.5 text-gray-400 hover:text-red-600 dark:text-gray-500 dark:hover:text-red-400 transition-colors rounded-lg"
+                  style={{ minHeight: '36px', minWidth: '36px' }}
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
             
-            <h3 className="text-subheading mb-2">{object.title}</h3>
+            <h3 className="text-subheading mb-1.5">{object.title}</h3>
             
             {object.type === 'recipe' && (
               <div className="space-compact-sm">
@@ -436,19 +436,21 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
       {/* Create/Edit Modal */}
       {showCreateModal && (
         <div className="modal-overlay">
-          <div className="bg-white dark:bg-gray-900 rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
+          <div className="bg-white dark:bg-gray-900 rounded-xl max-w-xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
             {/* Modal Header */}
             <div className="modal-header">
               <div className="flex items-start justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${getObjectColor(activeSection)} shadow-sm`}>
-                    {getObjectIcon(activeSection)}
+                <div className="flex items-center gap-2.5">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getObjectColor(activeSection)} shadow-sm`}>
+                    <div className="w-4 h-4 flex items-center justify-center">
+                      {getObjectIcon(activeSection)}
+                    </div>
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                    <h2 className="text-base font-bold text-gray-900 dark:text-white">
                       {editingObject ? 'Edit' : 'Create'} {activeSection.slice(0, -1)}
                     </h2>
-                    <p className="text-caption mt-1">
+                    <p className="text-caption mt-0.5">
                       {editingObject ? 'Update your existing item' : `Add a new ${activeSection.slice(0, -1).toLowerCase()}`}
                     </p>
                   </div>
@@ -458,20 +460,20 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
                     setShowCreateModal(false);
                     resetForm();
                   }}
-                  className="p-2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
-                  style={{ minHeight: '44px', minWidth: '44px' }}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
+                  style={{ minHeight: '36px', minWidth: '36px' }}
                 >
-                  <X className="w-5 h-5" />
+                  <X className="w-4 h-4" />
                 </button>
               </div>
             </div>
 
             {/* Modal Content */}
-            <div className="overflow-y-auto max-h-[calc(92vh-120px)]">
+            <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
               <div className="modal-body">
                 {/* Title Section */}
                 <div className="form-group">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1.5">
                     <label className="form-label">Title</label>
                     <span className="text-red-500 text-xs">*</span>
                   </div>
@@ -483,8 +485,8 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
                       className="input-field"
                       placeholder={`Enter ${activeSection.slice(0, -1).toLowerCase()} title...`}
                     />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <div className={`w-2 h-2 rounded-full transition-colors ${formData.title.trim() ? 'bg-green-500' : 'bg-gray-300'}`} />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-2.5">
+                      <div className={`w-1.5 h-1.5 rounded-full transition-colors ${formData.title.trim() ? 'bg-green-500' : 'bg-gray-300'}`} />
                     </div>
                   </div>
                 </div>
