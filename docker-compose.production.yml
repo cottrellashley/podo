@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database - INTERNAL ONLY
+  database:
+    image: postgres:15-alpine
+    container_name: podo-database
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_NAME:-podo}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    # NO external port mapping - only accessible within Docker network
+    networks:
+      - podo-internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-podo}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Backend API Server - INTERNAL ONLY
+  backend:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: podo-backend
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      # Database connection uses internal Docker network
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@database:5432/${DB_NAME:-podo}?sslmode=disable
+      JWT_SECRET: ${JWT_SECRET}
+      PORT: 3001
+      # Only allow frontend container to access API
+      CORS_ORIGINS: http://frontend,https://frontend
+    # NO external port mapping - only accessible within Docker network
+    depends_on:
+      database:
+        condition: service_healthy
+    networks:
+      - podo-internal
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+
+  # Nginx Reverse Proxy - EXTERNAL ACCESS
+  nginx:
+    image: nginx:alpine
+    container_name: podo-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"  # For HTTPS
+    volumes:
+      - ./nginx.prod.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro  # SSL certificates
+      - frontend_dist:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+      - frontend
+    networks:
+      - podo-internal
+
+  # Frontend Build - Internal build process
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        # API calls go through nginx proxy, not directly to backend
+        VITE_API_URL: /api
+    container_name: podo-frontend-build
+    volumes:
+      - frontend_dist:/app/dist
+    networks:
+      - podo-internal
+    command: ["sh", "-c", "npm run build && cp -r dist/* /app/dist/"]
+
+volumes:
+  postgres_data:
+    driver: local
+  frontend_dist:
+    driver: local
+
+networks:
+  podo-internal:
+    driver: bridge
+    internal: false  # Allows outbound internet for updates 
