@@ -1,11 +1,15 @@
 name: podo-app
+region: nyc
+
 services:
   # Backend API Service
   - name: backend
     source_dir: /server
     github:
-      repo: cottrellashley/podo
+      repo: ashleycottrell/podo
       branch: main
+      deploy_on_push: true
+    build_command: npm ci --only=production
     run_command: npm start
     environment_slug: node-js
     instance_count: 1
@@ -16,23 +20,32 @@ services:
     envs:
       - key: NODE_ENV
         value: production
+      - key: PORT
+        value: "3001"
       - key: JWT_SECRET
         value: ${JWT_SECRET}
         type: SECRET
       - key: DATABASE_URL
-        value: ${DATABASE_URL}
-        type: SECRET
+        value: ${podo-db.DATABASE_URL}
       - key: CORS_ORIGINS
-        value: ${_self.DOMAIN},https://${_self.DOMAIN}
+        value: https://${_self.DOMAIN}
+      - key: NODE_TLS_REJECT_UNAUTHORIZED
+        value: "0"
     health_check:
       http_path: /api/health
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
 
   # Frontend React Service
   - name: frontend
     source_dir: /
     github:
-      repo: cottrellashley/podo
+      repo: ashleycottrell/podo
       branch: main
+      deploy_on_push: true
     build_command: npm ci && npm run build
     run_command: npx serve -s dist -l 8080
     environment_slug: node-js
@@ -44,13 +57,22 @@ services:
     envs:
       - key: VITE_API_URL
         value: https://${backend.DOMAIN}/api
+    health_check:
+      http_path: /
+      initial_delay_seconds: 30
+      period_seconds: 10
+      timeout_seconds: 5
+      success_threshold: 1
+      failure_threshold: 3
 
-# Database (if using DigitalOcean Managed Database)
+# Database
 databases:
   - name: podo-db
     engine: PG
     version: "15"
     size: db-s-1vcpu-1gb
+    num_nodes: 1
+    production: false
 
 # Static Assets (optional - for better performance)
 static_sites:

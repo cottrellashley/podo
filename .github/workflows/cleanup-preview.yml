@@ -1,4 +1,4 @@
-name: Cleanup Preview Deployment
+name: Delete Preview
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ jobs:
   cleanup:
     runs-on: ubuntu-latest
     steps:
-      - name: Delete Preview App
+      - name: Delete preview app
         uses: digitalocean/app_action/delete@v2
         with:
           from_pr_preview: "true"

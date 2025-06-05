@@ -1,4 +1,4 @@
-name: Deploy Preview to DigitalOcean App Platform
+name: Deploy Preview
 
 on:
   pull_request:
@@ -6,7 +6,6 @@ on:
 
 permissions:
   contents: read
-  packages: write
   pull-requests: write
 
 jobs:
@@ -15,47 +14,15 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Build and push Frontend Docker image (Preview)
-        id: push-frontend
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./Dockerfile.frontend
-          push: true
-          tags: ghcr.io/${{ github.repository }}/frontend:pr-${{ github.event.number }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Build and push Backend Docker image (Preview)
-        id: push-backend
-        uses: docker/build-push-action@v6
-        with:
-          context: ./server
-          file: ./server/Dockerfile
-          push: true
-          tags: ghcr.io/${{ github.repository }}/backend:pr-${{ github.event.number }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-
-      - name: Deploy Preview App
+        
+      - name: Deploy preview app
         id: deploy
         uses: digitalocean/app_action/deploy@v2
         with:
           deploy_pr_preview: "true"
           token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Comment PR with Preview URL
+          
+      - name: Comment PR with preview URL
         uses: actions/github-script@v7
         env:
           BUILD_LOGS: ${{ steps.deploy.outputs.build_logs }}
@@ -67,17 +34,14 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `🚀 **Preview Deployed Successfully!**
+              body: `🚀 Preview app deployed successfully!
               
-              📱 **Preview URL:** ${{ fromJson(steps.deploy.outputs.app).live_url }}
+              **Preview URL:** ${{ fromJson(steps.deploy.outputs.app).live_url }}
               
-              This preview will be automatically deleted when the PR is closed or merged.
-              
-              ---
-              *Deployed from commit: ${{ github.sha }}*`
+              This preview will be automatically deleted when the PR is closed or merged.`
             })
-
-      - name: Comment PR on Deployment Failure
+            
+      - name: Comment PR on failure
         if: failure()
         uses: actions/github-script@v7
         env:
@@ -90,15 +54,15 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: `❌ **Preview Deployment Failed**
+              body: `❌ Preview deployment failed!
               
-              The preview deployment failed. Check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
+              **Logs:** [View full logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
               
               <details>
               <summary>Build Logs</summary>
               
               \`\`\`
-              ${BUILD_LOGS || 'No build logs available'}
+              ${BUILD_LOGS}
               \`\`\`
               </details>
               
@@ -106,7 +70,7 @@ jobs:
               <summary>Deploy Logs</summary>
               
               \`\`\`
-              ${DEPLOY_LOGS || 'No deploy logs available'}
+              ${DEPLOY_LOGS}
               \`\`\`
               </details>`
             }) 
