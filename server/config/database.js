@@ -20,15 +20,27 @@ const getDatabaseConfig = () => {
     if (isProduction || isCloudDatabase) {
       sslConfig = {
         rejectUnauthorized: false,
+        // Explicitly handle self-signed certificates
+        checkServerIdentity: () => undefined,
         // Additional SSL options for better compatibility
         ca: undefined,
         cert: undefined,
-        key: undefined
+        key: undefined,
+        // Force SSL mode
+        sslmode: 'require'
       };
     }
     
+    // For DigitalOcean managed databases, append SSL parameters to connection string
+    let finalConnectionString = databaseUrl;
+    if (isProduction || isCloudDatabase) {
+      if (!databaseUrl.includes('sslmode=')) {
+        finalConnectionString += (databaseUrl.includes('?') ? '&' : '?') + 'sslmode=require';
+      }
+    }
+    
     return {
-      connectionString: databaseUrl,
+      connectionString: finalConnectionString,
       ssl: sslConfig,
       // Additional connection options for stability
       connectionTimeoutMillis: 10000,
@@ -59,11 +71,25 @@ let pool = null;
 export const getPool = () => {
   if (!pool) {
     const config = getDatabaseConfig();
+    
+    // Log configuration for debugging (without sensitive data)
+    console.log('🔧 Database configuration:', {
+      ssl: config.ssl ? 'enabled' : 'disabled',
+      connectionTimeoutMillis: config.connectionTimeoutMillis,
+      max: config.max,
+      hasConnectionString: !!config.connectionString
+    });
+    
     pool = new Pool(config);
     
     // Handle pool errors
     pool.on('error', (err) => {
       console.error('Unexpected error on idle client', err);
+    });
+    
+    // Handle connection events
+    pool.on('connect', (client) => {
+      console.log('🔌 New database client connected');
     });
   }
   

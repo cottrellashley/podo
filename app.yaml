@@ -6,7 +6,7 @@ services:
       repo: cottrellashley/podo
       branch: main
     build_command: npm ci && npm run build
-    run_command: npx serve -s dist -l 8080
+    run_command: npx serve -s dist -l 8080 --host 0.0.0.0
     environment_slug: node-js
     instance_count: 1
     instance_size_slug: basic-xxs
