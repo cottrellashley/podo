@@ -18,6 +18,7 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+
   // Form states
   const [formData, setFormData] = useState({
     title: '',

@@ -17,15 +17,7 @@ const DataManager: React.FC<DataManagerProps> = ({ isOpen, onClose, currentTab }
 
   if (!isOpen) return null;
 
-  const getPageTitle = (page: string) => {
-    switch (page) {
-      case 'objects': return 'Library';
-      case 'week': return 'My Week';
-      case 'analytics': return 'Analytics';
-      case 'assistant': return 'Assistant';
-      default: return 'Data Manager';
-    }
-  };
+
 
   const getTabDisplayName = () => {
     switch (currentTab) {
