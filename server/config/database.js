@@ -9,25 +9,47 @@ const getDatabaseConfig = () => {
   const databaseUrl = process.env.DATABASE_URL;
   
   if (databaseUrl) {
-    // For DigitalOcean and other cloud providers, always use SSL with rejectUnauthorized: false
-    const needsSSL = databaseUrl.includes('ondigitalocean.com') || 
-                     databaseUrl.includes('sslmode=require') || 
-                     process.env.NODE_ENV === 'production';
+    // For production and cloud providers, always use SSL with proper configuration
+    const isProduction = process.env.NODE_ENV === 'production';
+    const isCloudDatabase = databaseUrl.includes('ondigitalocean.com') || 
+                           databaseUrl.includes('amazonaws.com') ||
+                           databaseUrl.includes('sslmode=require');
+    
+    let sslConfig = false;
+    
+    if (isProduction || isCloudDatabase) {
+      sslConfig = {
+        rejectUnauthorized: false,
+        // Additional SSL options for better compatibility
+        ca: undefined,
+        cert: undefined,
+        key: undefined
+      };
+    }
     
     return {
       connectionString: databaseUrl,
-      ssl: needsSSL ? { rejectUnauthorized: false } : false,
+      ssl: sslConfig,
+      // Additional connection options for stability
+      connectionTimeoutMillis: 10000,
+      idleTimeoutMillis: 30000,
+      max: 10
     };
   }
 
   // Fallback to individual environment variables
+  const isProduction = process.env.NODE_ENV === 'production';
+  
   return {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
     database: process.env.DB_NAME || 'podo',
     user: process.env.DB_USER || 'postgres',
     password: process.env.DB_PASSWORD || '',
-    ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+    ssl: isProduction ? { rejectUnauthorized: false } : false,
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 30000,
+    max: 10
   };
 };
 
