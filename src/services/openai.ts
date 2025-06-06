@@ -7,7 +7,7 @@ export interface AIResponse {
     scheduleItems?: {
       objectId: string;
       date: string;
-      timeCategory: TimeCategory;
+      time: string;
     }[];
   };
 }
@@ -106,7 +106,7 @@ Always respond with a JSON object containing:
       {
         "objectId": "id_of_object_to_schedule",
         "date": "YYYY-MM-DD",
-        "timeCategory": "Morning|Afternoon|Evening|Night"
+        "time": "HH:MM"
       }
     ]
   }
@@ -143,7 +143,7 @@ Response:
     "scheduleItems": [{
       "objectId": "rec_chicken_pasta_001",
       "date": "${today}",
-      "timeCategory": "Evening"
+      "time": "18:00"
     }]
   }
 }
@@ -167,7 +167,7 @@ Response:
     "scheduleItems": [{
       "objectId": "wkt_morning_001",
       "date": "${new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]}",
-      "timeCategory": "Morning"
+      "time": "07:00"
     }]
   }
 }

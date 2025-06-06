@@ -30,7 +30,7 @@ const Home: React.FC<HomeProps> = ({ onNavigate }) => {
       .filter(item => item.date === today)
       .sort((a, b) => {
         const categoryOrder = { Morning: 0, Afternoon: 1, Evening: 2, Night: 3 };
-        const categoryDiff = categoryOrder[a.timeCategory] - categoryOrder[b.timeCategory];
+        const categoryDiff = (categoryOrder[a.timeCategory as keyof typeof categoryOrder] || 0) - (categoryOrder[b.timeCategory as keyof typeof categoryOrder] || 0);
         return categoryDiff !== 0 ? categoryDiff : a.order - b.order;
       });
   };
