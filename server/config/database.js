@@ -4,6 +4,11 @@ import dotenv from 'dotenv';
 // Load environment variables
 dotenv.config();
 
+// For DigitalOcean managed databases, disable SSL certificate verification
+if (process.env.NODE_ENV === 'production') {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+}
+
 // Database configuration
 const getDatabaseConfig = () => {
   const databaseUrl = process.env.DATABASE_URL;
@@ -18,29 +23,14 @@ const getDatabaseConfig = () => {
     let sslConfig = false;
     
     if (isProduction || isCloudDatabase) {
+      // For DigitalOcean managed databases, use minimal SSL config
       sslConfig = {
-        rejectUnauthorized: false,
-        // Explicitly handle self-signed certificates
-        checkServerIdentity: () => undefined,
-        // Additional SSL options for better compatibility
-        ca: undefined,
-        cert: undefined,
-        key: undefined,
-        // Force SSL mode
-        sslmode: 'require'
+        rejectUnauthorized: false
       };
     }
     
-    // For DigitalOcean managed databases, append SSL parameters to connection string
-    let finalConnectionString = databaseUrl;
-    if (isProduction || isCloudDatabase) {
-      if (!databaseUrl.includes('sslmode=')) {
-        finalConnectionString += (databaseUrl.includes('?') ? '&' : '?') + 'sslmode=require';
-      }
-    }
-    
     return {
-      connectionString: finalConnectionString,
+      connectionString: databaseUrl,
       ssl: sslConfig,
       // Additional connection options for stability
       connectionTimeoutMillis: 10000,
