@@ -33,9 +33,9 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-production}
       DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD:-postgres}@database:5432/${DB_NAME:-podo}?sslmode=disable
-      JWT_SECRET: ${JWT_SECRET}
+      JWT_SECRET: ${JWT_SECRET:-change-this-secret}
       PORT: 3001
-      CORS_ORIGINS: http://localhost,http://localhost:80,http://localhost:3000,http://frontend
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost,http://localhost:80}
     ports:
       - "3001:3001"
     depends_on:
@@ -51,13 +51,13 @@ services:
   frontend:
     build:
       context: .
-      dockerfile: Dockerfile.frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
     container_name: podo-frontend
     restart: unless-stopped
-    environment:
-      VITE_API_URL: http://localhost:3001/api
     ports:
-      - "80:80"
+      - "${PORT:-80}:80"
     depends_on:
       - backend
     networks:
