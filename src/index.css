@@ -70,9 +70,11 @@
   }
   
   .content-container {
-    @apply p-2 sm:p-3 max-w-7xl mx-auto;
+    @apply p-2 sm:p-3 max-w-full mx-auto;
     /* Ensure content doesn't touch screen edges on mobile */
     min-height: calc(100vh - 80px);
+    padding-left: 1rem;
+    padding-right: 1rem;
   }
 
   .button-primary {
@@ -285,12 +287,13 @@
 
   /* Compact section header with inline plus */
   .section-header-compact {
-    @apply flex items-center gap-1.5 mb-1.5;
+    @apply flex items-start justify-between gap-3 mb-2;
   }
 
   .section-title-compact {
-    @apply text-xs font-medium text-gray-700 dark:text-gray-300;
+    @apply text-sm font-bold text-gray-900 dark:text-gray-100;
     line-height: 1.2;
+    letter-spacing: -0.017em;
   }
 
   .section-add-button {
@@ -312,27 +315,101 @@
     @apply sticky bottom-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur-sm border-t border-gray-100 dark:border-gray-800 p-3;
   }
 
-  /* Week view optimizations */
-  .week-day-card {
-    @apply card transition-all duration-200;
-    min-height: 250px;
+  /* Week view optimizations - Grid Layout */
+  .week-grid {
+    @apply bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden;
+    min-height: calc(100vh - 300px);
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
   }
 
-  .week-day-header {
-    @apply p-2.5 border-b border-gray-100 dark:border-gray-700;
+  .week-header {
+    @apply sticky top-0 z-10 bg-white dark:bg-gray-900;
   }
 
-  .week-day-content {
-    @apply p-2.5 space-y-2.5;
-    min-height: 200px;
+  .time-column-header {
+    @apply p-2 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700;
   }
 
-  .time-category-badge {
-    @apply text-xs font-medium px-1.5 py-0.5 rounded-full inline-flex items-center gap-1;
+  .day-header {
+    @apply p-2 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0;
   }
 
-  .scheduled-item {
-    @apply p-2 rounded-lg border transition-all duration-200 cursor-pointer;
+  .time-section-row {
+    @apply border-b border-gray-100 dark:border-gray-800 last:border-b-0;
+    min-height: 60px;
+  }
+
+  .time-section-label {
+    @apply p-2 bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col;
+    position: relative;
+    min-height: 60px;
+  }
+
+  .hourly-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: #e5e7eb;
+    opacity: 0.3;
+  }
+
+  .dark .hourly-bar {
+    background-color: #374151;
+  }
+
+  .time-section-highlight {
+    background-color: rgba(59, 130, 246, 0.05);
+    border-left: 3px solid #3b82f6;
+  }
+
+  .dark .time-section-highlight {
+    background-color: rgba(59, 130, 246, 0.1);
+  }
+
+  .day-cell {
+    @apply p-2 border-r border-gray-200 dark:border-gray-700 last:border-r-0;
+    min-height: 60px;
+  }
+
+  .scheduled-item-compact {
+    @apply p-2 rounded-md border text-xs transition-all duration-200 cursor-pointer hover:shadow-sm;
+  }
+
+  /* Subtle background colors for better visual separation */
+  .bg-brand-25 {
+    background-color: rgba(117, 148, 145, 0.02);
+  }
+
+  .dark .bg-brand-25 {
+    background-color: rgba(117, 148, 145, 0.05);
+  }
+
+  .bg-brand-950 {
+    background-color: rgba(117, 148, 145, 0.95);
+  }
+
+  .dark .bg-brand-950 {
+    background-color: rgba(117, 148, 145, 0.1);
+  }
+
+  .bg-gray-25 {
+    background-color: rgba(0, 0, 0, 0.01);
+  }
+
+  .dark .bg-gray-25 {
+    background-color: rgba(255, 255, 255, 0.02);
+  }
+
+  .bg-gray-850 {
+    background-color: rgba(0, 0, 0, 0.85);
+  }
+
+  .dark .bg-gray-850 {
+    background-color: rgba(255, 255, 255, 0.05);
   }
 
   /* Brand colors with dark mode support */

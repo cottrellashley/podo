@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import type { ObjectType, ScheduledItem, TimeCategory, WeekData, IndividualTodo } from '../types';
+import type { ObjectType, ScheduledItem, TimeCategory, WeekData, IndividualTodo, TimeSection } from '../types';
 import { 
   saveObjects, 
   loadObjects, 
@@ -35,13 +35,22 @@ interface AppContextType {
   updateObject: (id: string, object: ObjectType) => void;
   deleteObject: (id: string) => void;
   
+  // Time sections state
+  timeSections: TimeSection[];
+  setTimeSections: React.Dispatch<React.SetStateAction<TimeSection[]>>;
+  addTimeSection: (section: TimeSection) => void;
+  updateTimeSection: (id: string, section: TimeSection) => void;
+  deleteTimeSection: (id: string) => void;
+  getTimeSectionForTime: (time: string) => TimeSection | null;
+  getDefaultTimeSections: () => TimeSection[];
+  
   // Scheduled items state
   scheduledItems: ScheduledItem[];
   setScheduledItems: React.Dispatch<React.SetStateAction<ScheduledItem[]>>;
   addScheduledItem: (item: ScheduledItem) => void;
   updateScheduledItem: (id: string, updates: Partial<ScheduledItem>) => void;
   deleteScheduledItem: (id: string) => void;
-  moveScheduledItem: (id: string, newDate: string, newTimeCategory: TimeCategory, newOrder: number) => void;
+  moveScheduledItem: (id: string, newDate: string, newTime: string, newOrder: number) => void;
   toggleItemCompletion: (scheduledItemId: string, itemId?: string) => void;
   
   // Week navigation
@@ -55,7 +64,7 @@ interface AppContextType {
   openAIService: OpenAIService | null;
   
   // AI Actions
-  processAIResponse: (objects?: ObjectType[], scheduleItems?: Array<{objectId: string, date: string, timeCategory: TimeCategory}>) => void;
+  processAIResponse: (objects?: ObjectType[], scheduleItems?: Array<{objectId: string, date: string, time: string}>) => void;
   
   // Data management
   exportData: () => any;
@@ -96,6 +105,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   // Initialize state - will be loaded per user
   const [objects, setObjects] = useState<ObjectType[]>([]);
   const [scheduledItems, setScheduledItems] = useState<ScheduledItem[]>([]);
+  const [timeSections, setTimeSections] = useState<TimeSection[]>([]);
   const [currentWeekStart, setCurrentWeekStart] = useState<Date>(new Date());
   const [isOnline, setIsOnline] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<string | null>(user?.id || null);
@@ -373,8 +383,8 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     }
   };
 
-  const moveScheduledItem = (id: string, newDate: string, newTimeCategory: TimeCategory, newOrder: number) => {
-    updateScheduledItem(id, { date: newDate, timeCategory: newTimeCategory, order: newOrder });
+  const moveScheduledItem = (id: string, newDate: string, newTime: string, newOrder: number) => {
+    updateScheduledItem(id, { date: newDate, time: newTime, order: newOrder });
   };
 
   const toggleItemCompletion = (scheduledItemId: string, itemId?: string) => {
@@ -383,22 +393,42 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
         if (scheduledItem.id === scheduledItemId) {
           const updatedData = { ...scheduledItem.data };
           
-          if (scheduledItem.objectType === 'workout' && itemId) {
+          if (scheduledItem.objectType === 'recipe' && itemId) {
+            // Toggle recipe instruction completion
+            const recipe = updatedData as any;
+            if (recipe.instructions) {
+              recipe.instructions = recipe.instructions.map((instruction: any, index: number) => {
+                const instructionId = instruction.id || `instruction-${index}`;
+                if (instructionId === itemId) {
+                  return { 
+                    ...instruction, 
+                    completed: !instruction.completed,
+                    id: instructionId // Ensure ID exists
+                  };
+                }
+                return instruction;
+              });
+            }
+          } else if (scheduledItem.objectType === 'workout' && itemId) {
             // Toggle exercise completion
             const workout = updatedData as any;
-            workout.exercises = workout.exercises.map((exercise: any) => 
-              exercise.id === itemId 
-                ? { ...exercise, completed: !exercise.completed }
-                : exercise
-            );
+            if (workout.exercises) {
+              workout.exercises = workout.exercises.map((exercise: any) => 
+                exercise.id === itemId 
+                  ? { ...exercise, completed: !exercise.completed }
+                  : exercise
+              );
+            }
           } else if (scheduledItem.objectType === 'todoList' && itemId) {
             // Toggle todo item completion
             const todoList = updatedData as any;
-            todoList.items = todoList.items.map((item: any) => 
-              item.id === itemId 
-                ? { ...item, completed: !item.completed }
-                : item
-            );
+            if (todoList.items) {
+              todoList.items = todoList.items.map((item: any) => 
+                item.id === itemId 
+                  ? { ...item, completed: !item.completed }
+                  : item
+              );
+            }
           } else if (scheduledItem.objectType === 'individualTodo') {
             // Toggle individual todo completion
             const individualTodo = updatedData as IndividualTodo;
@@ -433,7 +463,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 
   const processAIResponse = (
     newObjects?: ObjectType[], 
-    scheduleItems?: Array<{objectId: string, date: string, timeCategory: TimeCategory}>
+    scheduleItems?: Array<{objectId: string, date: string, time: string}>
   ) => {
     if (newObjects && newObjects.length > 0) {
       setObjects(prev => {
@@ -455,7 +485,7 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
           objectId: item.objectId,
           objectType: objectData.type,
           date: item.date,
-          timeCategory: item.timeCategory,
+          time: item.time,
           order: 0,
           data: objectData
         };
@@ -529,9 +559,16 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
       weekData[dateString] = scheduledItems
         .filter(item => item.date === dateString)
         .sort((a, b) => {
-          const timeOrder = { 'Morning': 0, 'Afternoon': 1, 'Evening': 2, 'Night': 3 };
-          const timeComparison = timeOrder[a.timeCategory] - timeOrder[b.timeCategory];
-          return timeComparison !== 0 ? timeComparison : a.order - b.order;
+          // Sort by time if available, otherwise fall back to legacy timeCategory
+          if (a.time && b.time) {
+            const timeComparison = a.time.localeCompare(b.time);
+            return timeComparison !== 0 ? timeComparison : a.order - b.order;
+          } else if (a.timeCategory && b.timeCategory) {
+            const timeOrder = { 'Morning': 0, 'Afternoon': 1, 'Evening': 2, 'Night': 3 };
+            const timeComparison = timeOrder[a.timeCategory] - timeOrder[b.timeCategory];
+            return timeComparison !== 0 ? timeComparison : a.order - b.order;
+          }
+          return a.order - b.order;
         });
     }
     
@@ -542,12 +579,61 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     return objects.find(obj => obj.id === id);
   };
 
+  // Time sections functions
+  const getDefaultTimeSections = (): TimeSection[] => [
+    { id: '1', name: 'Morning', startTime: '06:00', endTime: '12:00', order: 1, createdAt: new Date() },
+    { id: '2', name: 'Afternoon', startTime: '12:00', endTime: '17:00', order: 2, createdAt: new Date() },
+    { id: '3', name: 'Evening', startTime: '17:00', endTime: '21:00', order: 3, createdAt: new Date() },
+    { id: '4', name: 'Night', startTime: '21:00', endTime: '06:00', order: 4, createdAt: new Date() }
+  ];
+
+  const addTimeSection = (section: TimeSection) => {
+    setTimeSections(prev => [...prev, section]);
+  };
+
+  const updateTimeSection = (id: string, section: TimeSection) => {
+    setTimeSections(prev => prev.map(s => s.id === id ? section : s));
+  };
+
+  const deleteTimeSection = (id: string) => {
+    setTimeSections(prev => prev.filter(s => s.id !== id));
+  };
+
+  const getTimeSectionForTime = (time: string): TimeSection | null => {
+    const sections = timeSections.length > 0 ? timeSections : getDefaultTimeSections();
+    
+    for (const section of sections) {
+      const startTime = section.startTime;
+      const endTime = section.endTime;
+      
+      // Handle overnight sections (e.g., Night: 21:00 - 06:00)
+      if (startTime > endTime) {
+        if (time >= startTime || time < endTime) {
+          return section;
+        }
+      } else {
+        if (time >= startTime && time < endTime) {
+          return section;
+        }
+      }
+    }
+    
+    return null;
+  };
+
   const value: AppContextType = {
     objects,
     setObjects,
     addObject,
     updateObject,
     deleteObject,
+    timeSections,
+    setTimeSections,
+    addTimeSection,
+    updateTimeSection,
+    deleteTimeSection,
+    getTimeSectionForTime,
+    getDefaultTimeSections,
     scheduledItems,
     setScheduledItems,
     addScheduledItem,

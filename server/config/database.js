@@ -111,10 +111,13 @@ export const testConnection = async () => {
 // Initialize database tables
 export const initializeDatabase = async () => {
   const pool = getPool();
+  const client = await pool.connect();
   
   try {
+    console.log('🔌 Using dedicated client for database initialization');
+    
     // Create users table
-    await pool.query(`
+    await client.query(`
       CREATE TABLE IF NOT EXISTS users (
         id VARCHAR(255) PRIMARY KEY,
         email VARCHAR(255) UNIQUE NOT NULL,
@@ -127,7 +130,7 @@ export const initializeDatabase = async () => {
     `);
 
     // Create user_objects table
-    await pool.query(`
+    await client.query(`
       CREATE TABLE IF NOT EXISTS user_objects (
         id VARCHAR(255) PRIMARY KEY,
         user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -138,7 +141,7 @@ export const initializeDatabase = async () => {
     `);
 
     // Create user_week_objects table
-    await pool.query(`
+    await client.query(`
       CREATE TABLE IF NOT EXISTS user_week_objects (
         id VARCHAR(255) PRIMARY KEY,
         user_id VARCHAR(255) NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -149,7 +152,7 @@ export const initializeDatabase = async () => {
     `);
 
     // Create indexes for better performance
-    await pool.query(`
+    await client.query(`
       CREATE INDEX IF NOT EXISTS idx_user_objects_user_id ON user_objects(user_id);
       CREATE INDEX IF NOT EXISTS idx_user_week_objects_user_id ON user_week_objects(user_id);
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
@@ -159,5 +162,8 @@ export const initializeDatabase = async () => {
   } catch (error) {
     console.error('❌ Error initializing database:', error);
     throw error;
+  } finally {
+    // Always release the client back to the pool
+    client.release();
   }
 }; 

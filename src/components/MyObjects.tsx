@@ -437,165 +437,156 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
       {/* Create/Edit Modal */}
       {showCreateModal && (
         <div className="modal-overlay">
-          <div className="bg-white dark:bg-gray-900 rounded-xl max-w-xl w-full max-h-[90vh] overflow-hidden shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[92vh] overflow-hidden shadow-2xl border border-gray-200/50 dark:border-gray-700/50">
             {/* Modal Header */}
-            <div className="modal-header">
-              <div className="flex items-start justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getObjectColor(activeSection)} shadow-sm`}>
-                    <div className="w-4 h-4 flex items-center justify-center">
-                      {getObjectIcon(activeSection)}
-                    </div>
-                  </div>
-                  <div>
-                    <h2 className="text-base font-bold text-gray-900 dark:text-white">
-                      {editingObject ? 'Edit' : 'Create'} {activeSection.slice(0, -1)}
-                    </h2>
-                    <p className="text-caption mt-0.5">
-                      {editingObject ? 'Update your existing item' : `Add a new ${activeSection.slice(0, -1).toLowerCase()}`}
-                    </p>
+            <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
+              <div className="flex items-center gap-3">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shadow-sm ${
+                  activeSection === 'recipes' 
+                    ? 'bg-gradient-to-br from-emerald-500 to-green-600'
+                    : activeSection === 'workouts'
+                    ? 'bg-gradient-to-br from-blue-500 to-purple-600'
+                    : 'bg-gradient-to-br from-purple-500 to-pink-600'
+                }`}>
+                  <div className="text-white">
+                    {getObjectIcon(activeSection)}
                   </div>
                 </div>
-                <button
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    resetForm();
-                  }}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all duration-200"
-                  style={{ minHeight: '36px', minWidth: '36px' }}
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    {editingObject ? 'Edit' : 'Create'} {activeSection.slice(0, -1)}
+                  </h2>
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                    {editingObject ? 'Update your existing item' : `Add a new ${activeSection.slice(0, -1).toLowerCase()}`}
+                  </p>
+                </div>
               </div>
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  resetForm();
+                }}
+                className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Modal Content */}
-            <div className="overflow-y-auto max-h-[calc(90vh-100px)]">
-              <div className="modal-body">
+            <div className="p-4 overflow-y-auto max-h-[calc(92vh-120px)]">
+              <div className="space-y-3">
                 {/* Title Section */}
-                <div className="form-group">
-                  <div className="flex items-center gap-1.5">
-                    <label className="form-label">Title</label>
-                    <span className="text-red-500 text-xs">*</span>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      value={formData.title}
-                      onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                      className="input-field"
-                      placeholder={`Enter ${activeSection.slice(0, -1).toLowerCase()} title...`}
-                    />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-2.5">
-                      <div className={`w-1.5 h-1.5 rounded-full transition-colors ${formData.title.trim() ? 'bg-green-500' : 'bg-gray-300'}`} />
-                    </div>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
+                    placeholder={`Enter ${activeSection.slice(0, -1).toLowerCase()} title...`}
+                  />
                 </div>
 
                 {/* Recipe Form */}
                 {activeSection === 'recipes' && (
-                  <div className="space-compact">
+                  <div className="space-y-3">
                     {/* Ingredients Section */}
-                    <div className="form-section">
-                      <div className="section-header-compact">
-                        <ChefHat className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-                        <h3 className="section-title-compact">Ingredients</h3>
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Ingredients</h3>
                         <button
                           type="button"
                           onClick={addIngredient}
-                          className="section-add-button"
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-md transition-colors dark:bg-emerald-900/20 dark:text-emerald-400 dark:hover:bg-emerald-900/30"
                         >
                           <Plus className="w-3 h-3" />
+                          Add
                         </button>
                       </div>
-                      <div className="space-compact-sm">
+                      <div className="space-y-1.5">
                         {formData.ingredients.map((ingredient, index) => (
-                          <div key={ingredient.id} className="dynamic-list-item">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400">
-                                {index + 1}
-                              </div>
-                              <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <input
-                                  type="text"
-                                  value={ingredient.name}
-                                  onChange={(e) => updateIngredient(ingredient.id, 'name', e.target.value)}
-                                  placeholder="Ingredient"
-                                  className="input-field text-sm"
-                                />
-                                <input
-                                  type="number"
-                                  value={ingredient.amount}
-                                  onChange={(e) => updateIngredient(ingredient.id, 'amount', parseFloat(e.target.value) || 0)}
-                                  placeholder="Amount"
-                                  className="input-field text-sm"
-                                  min="0"
-                                  step="0.1"
-                                />
-                                <input
-                                  type="text"
-                                  value={ingredient.unit}
-                                  onChange={(e) => updateIngredient(ingredient.id, 'unit', e.target.value)}
-                                  placeholder="Unit"
-                                  className="input-field text-sm"
-                                />
-                              </div>
-                              {formData.ingredients.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeIngredient(ingredient.id)}
-                                  className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
-                                  style={{ minHeight: '44px', minWidth: '44px' }}
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
+                          <div key={ingredient.id} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div className="w-6 h-6 bg-emerald-100 dark:bg-emerald-900/30 rounded-md flex items-center justify-center text-xs font-medium text-emerald-600 dark:text-emerald-400">
+                              {index + 1}
                             </div>
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                              <input
+                                type="text"
+                                value={ingredient.name}
+                                onChange={(e) => updateIngredient(ingredient.id, 'name', e.target.value)}
+                                placeholder="Ingredient"
+                                className="px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                              />
+                              <input
+                                type="number"
+                                value={ingredient.amount}
+                                onChange={(e) => updateIngredient(ingredient.id, 'amount', parseFloat(e.target.value) || 0)}
+                                placeholder="Amount"
+                                className="px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                                min="0"
+                                step="0.1"
+                              />
+                              <input
+                                type="text"
+                                value={ingredient.unit}
+                                onChange={(e) => updateIngredient(ingredient.id, 'unit', e.target.value)}
+                                placeholder="Unit"
+                                className="px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-emerald-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                              />
+                            </div>
+                            {formData.ingredients.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeIngredient(ingredient.id)}
+                                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Instructions Section */}
-                    <div className="form-section">
-                      <div className="section-header-compact">
-                        <FileText className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <h3 className="section-title-compact">Instructions</h3>
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Instructions</h3>
                         <button
                           type="button"
                           onClick={addInstruction}
-                          className="section-add-button"
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md transition-colors dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                         >
                           <Plus className="w-3 h-3" />
+                          Add
                         </button>
                       </div>
-                      <div className="space-compact-sm">
+                      <div className="space-y-1.5">
                         {formData.instructions.map((instruction, index) => (
-                          <div key={index} className="dynamic-list-item">
-                            <div className="flex gap-3">
-                              <div className="flex-shrink-0 w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center text-sm font-bold text-blue-600 dark:text-blue-400">
-                                {index + 1}
-                              </div>
-                              <div className="flex-1">
-                                <textarea
-                                  value={instruction}
-                                  onChange={(e) => updateInstruction(index, e.target.value)}
-                                  placeholder="Describe this step..."
-                                  className="input-field resize-none text-sm"
-                                  rows={2}
-                                />
-                              </div>
-                              {formData.instructions.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeInstruction(index)}
-                                  className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200 self-start"
-                                  style={{ minHeight: '44px', minWidth: '44px' }}
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
+                          <div key={index} className="flex gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-md flex items-center justify-center text-xs font-medium text-blue-600 dark:text-blue-400 flex-shrink-0">
+                              {index + 1}
                             </div>
+                            <div className="flex-1">
+                              <textarea
+                                value={instruction}
+                                onChange={(e) => updateInstruction(index, e.target.value)}
+                                placeholder="Describe this step..."
+                                className="w-full px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 resize-none"
+                                rows={2}
+                              />
+                            </div>
+                            {formData.instructions.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeInstruction(index)}
+                                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors self-start"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
@@ -605,92 +596,89 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
 
                 {/* Workout Form */}
                 {activeSection === 'workouts' && (
-                  <div className="space-compact">
+                  <div className="space-y-3">
                     {/* Body Group */}
-                    <div className="form-group">
-                      <label className="form-label">
-                        Body Group <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Body Group <span className="text-gray-400 text-xs">(Optional)</span>
                       </label>
                       <input
                         type="text"
                         value={formData.bodyGroup}
                         onChange={(e) => setFormData(prev => ({ ...prev, bodyGroup: e.target.value }))}
-                        className="input-field"
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                         placeholder="e.g., Upper Body, Legs, Core..."
                       />
                     </div>
 
                     {/* Exercises Section */}
-                    <div className="form-section">
-                      <div className="section-header-compact">
-                        <Dumbbell className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                        <h3 className="section-title-compact">Exercises</h3>
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Exercises</h3>
                         <button
                           type="button"
                           onClick={addExercise}
-                          className="section-add-button"
+                          className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-md transition-colors dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/30"
                         >
                           <Plus className="w-3 h-3" />
+                          Add
                         </button>
                       </div>
-                      <div className="space-compact-sm">
+                      <div className="space-y-1.5">
                         {formData.exercises.map((exercise, index) => (
-                          <div key={exercise.id} className="dynamic-list-item">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400">
-                                {index + 1}
-                              </div>
-                              <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                <input
-                                  type="text"
-                                  value={exercise.name}
-                                  onChange={(e) => updateExercise(exercise.id, 'name', e.target.value)}
-                                  placeholder="Exercise name"
-                                  className="input-field text-sm"
-                                />
-                                <input
-                                  type="number"
-                                  value={exercise.sets}
-                                  onChange={(e) => updateExercise(exercise.id, 'sets', parseInt(e.target.value) || 0)}
-                                  placeholder="Sets"
-                                  className="input-field text-sm"
-                                  min="1"
-                                />
-                                <input
-                                  type="number"
-                                  value={exercise.reps}
-                                  onChange={(e) => updateExercise(exercise.id, 'reps', parseInt(e.target.value) || 0)}
-                                  placeholder="Reps"
-                                  className="input-field text-sm"
-                                  min="1"
-                                />
-                              </div>
-                              {formData.exercises.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => removeExercise(exercise.id)}
-                                  className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
-                                  style={{ minHeight: '44px', minWidth: '44px' }}
-                                >
-                                  <X className="w-4 h-4" />
-                                </button>
-                              )}
+                          <div key={exercise.id} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div className="w-6 h-6 bg-blue-100 dark:bg-blue-900/30 rounded-md flex items-center justify-center text-xs font-medium text-blue-600 dark:text-blue-400">
+                              {index + 1}
                             </div>
+                            <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-1.5">
+                              <input
+                                type="text"
+                                value={exercise.name}
+                                onChange={(e) => updateExercise(exercise.id, 'name', e.target.value)}
+                                placeholder="Exercise name"
+                                className="px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                              />
+                              <input
+                                type="number"
+                                value={exercise.sets}
+                                onChange={(e) => updateExercise(exercise.id, 'sets', parseInt(e.target.value) || 0)}
+                                placeholder="Sets"
+                                className="px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                                min="1"
+                              />
+                              <input
+                                type="number"
+                                value={exercise.reps}
+                                onChange={(e) => updateExercise(exercise.id, 'reps', parseInt(e.target.value) || 0)}
+                                placeholder="Reps"
+                                className="px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                                min="1"
+                              />
+                            </div>
+                            {formData.exercises.length > 1 && (
+                              <button
+                                type="button"
+                                onClick={() => removeExercise(exercise.id)}
+                                className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                              >
+                                <X className="w-3 h-3" />
+                              </button>
+                            )}
                           </div>
                         ))}
                       </div>
                     </div>
 
                     {/* Notes Section */}
-                    <div className="form-group">
-                      <label className="form-label">
-                        Notes <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                        Notes <span className="text-gray-400 text-xs">(Optional)</span>
                       </label>
                       <textarea
                         value={formData.notes}
                         onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                        className="input-field resize-none"
-                        rows={3}
+                        className="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 resize-none"
+                        rows={2}
                         placeholder="Additional notes about this workout..."
                       />
                     </div>
@@ -699,43 +687,40 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
 
                 {/* Todo List Form */}
                 {activeSection === 'todoLists' && (
-                  <div className="form-section">
-                    <div className="section-header-compact">
-                      <CheckSquare className="w-4 h-4 text-purple-600 dark:text-purple-400" />
-                      <h3 className="section-title-compact">Tasks</h3>
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-gray-100">Tasks</h3>
                       <button
                         type="button"
                         onClick={addTodoItem}
-                        className="section-add-button"
+                        className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs bg-purple-50 hover:bg-purple-100 text-purple-700 rounded-md transition-colors dark:bg-purple-900/20 dark:text-purple-400 dark:hover:bg-purple-900/30"
                       >
                         <Plus className="w-3 h-3" />
+                        Add
                       </button>
                     </div>
-                    <div className="space-compact-sm">
+                    <div className="space-y-1.5">
                       {formData.todoItems.map((item, index) => (
-                        <div key={item.id} className="dynamic-list-item">
-                          <div className="flex items-center gap-2">
-                            <div className="w-6 h-6 bg-gray-100 dark:bg-gray-800 rounded-md flex items-center justify-center text-xs font-medium text-gray-600 dark:text-gray-400">
-                              {index + 1}
-                            </div>
-                            <input
-                              type="text"
-                              value={item.text}
-                              onChange={(e) => updateTodoItem(item.id, 'text', e.target.value)}
-                              placeholder="Enter task description..."
-                              className="flex-1 input-field text-sm"
-                            />
-                            {formData.todoItems.length > 1 && (
-                              <button
-                                type="button"
-                                onClick={() => removeTodoItem(item.id)}
-                                className="p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
-                                style={{ minHeight: '44px', minWidth: '44px' }}
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            )}
+                        <div key={item.id} className="flex items-center gap-2 p-2 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                          <div className="w-6 h-6 bg-purple-100 dark:bg-purple-900/30 rounded-md flex items-center justify-center text-xs font-medium text-purple-600 dark:text-purple-400">
+                            {index + 1}
                           </div>
+                          <input
+                            type="text"
+                            value={item.text}
+                            onChange={(e) => updateTodoItem(item.id, 'text', e.target.value)}
+                            placeholder="Enter task description..."
+                            className="flex-1 px-2.5 py-1.5 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:ring-1 focus:ring-purple-500 focus:border-transparent bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                          />
+                          {formData.todoItems.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeTodoItem(item.id)}
+                              className="p-1.5 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                            >
+                              <X className="w-3 h-3" />
+                            </button>
+                          )}
                         </div>
                       ))}
                     </div>
@@ -745,25 +730,23 @@ const MyObjects: React.FC<MyObjectsProps> = ({ onOpenDataManager }) => {
             </div>
 
             {/* Modal Footer */}
-            <div className="modal-footer">
-              <div className="flex gap-3">
-                <button
-                  onClick={() => {
-                    setShowCreateModal(false);
-                    resetForm();
-                  }}
-                  className="flex-1 button-secondary"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleCreateOrUpdateObject}
-                  className="flex-1 button-primary"
-                  disabled={!formData.title.trim()}
-                >
-                  {editingObject ? 'Update' : 'Create'}
-                </button>
-              </div>
+            <div className="flex items-center justify-end gap-2 p-4 border-t border-gray-200 dark:border-gray-700">
+              <button
+                onClick={() => {
+                  setShowCreateModal(false);
+                  resetForm();
+                }}
+                className="px-3 py-1.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleCreateOrUpdateObject}
+                className="px-4 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                disabled={!formData.title.trim()}
+              >
+                {editingObject ? 'Update' : 'Create'}
+              </button>
             </div>
           </div>
         </div>
